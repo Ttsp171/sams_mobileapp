@@ -42,6 +42,9 @@ class _CustomLoginTextFieldState extends State<CustomLoginTextField> {
           errorText: widget.errorText,
         ),
         onChanged: widget.onChanged,
+        onTapOutside: (event) {
+          FocusScope.of(context).unfocus();
+        },
       ),
     );
   }
