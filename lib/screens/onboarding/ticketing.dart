@@ -28,7 +28,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
       roomDropDown = [],
       roomDropDownValues = [],
       subjectDropDown = [],
-      subjectDropDownValues = [],
+      subjectDropDownValues = ["Subject 1", "Subject 2", "Subject 3"],
       attachment = [];
 
   String? employeeError,
@@ -40,7 +40,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
       messageError,
       subjectError;
 
-  String employeeName = "", contactNo = "", subject = "Sample", message = "";
+  String employeeName = "", contactNo = "", subject = "", message = "";
 
   int? buildingId, roomId, cityId, companyId;
 
@@ -48,7 +48,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
   void initState() {
     super.initState();
     getDropDownData('/api/get-fmticket-company', "company", context);
-    getDropDownData('/api/get-fmticket-company', "subject", context);
+    // getDropDownData('/api/get-fmticket-company', "subject", context);
   }
 
   getDropDownData(endpoint, field, context) async {
@@ -94,16 +94,16 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
           });
         }
       }
-      if (field == "subject") {
-        setState(() {
-          subjectDropDown = res["data"]["data"];
-        });
-        for (var subject in res["data"]["data"]) {
-          setState(() {
-            subjectDropDownValues.add(subject["building_no"]);
-          });
-        }
-      }
+      // if (field == "subject") {
+      //   setState(() {
+      //     subjectDropDown = res["data"]["data"];
+      //   });
+      //   for (var subject in res["data"]["data"]) {
+      //     setState(() {
+      //       subjectDropDownValues.add(subject["building_no"]);
+      //     });
+      //   }
+      // }
     } else {
       showToast("Something went Wrong in $field");
     }
@@ -401,7 +401,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
                   errorText: subjectError,
                   labelText: "Subject:",
                   hintText: "Please Select Subject",
-                  dropDownData: const ["Subject 1", "Subject 2", "Subject 3"],
+                  dropDownData: subjectDropDownValues,
                   isRequired: true,
                   onChanged: (val) {
                     setState(() {

@@ -89,6 +89,7 @@ class _CustomDropDownState extends State<CustomDropDown> {
                   focusColor: Colors.blue,
                   isExpanded: true,
                   value: initialValue,
+                  style: const TextStyle(fontWeight: FontWeight.normal),
                   hint: Padding(
                     padding: const EdgeInsets.only(left: 15.0),
                     child: Text(

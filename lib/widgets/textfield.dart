@@ -113,6 +113,7 @@ class CustomTextFieldWithLabel extends StatelessWidget {
             padding: const EdgeInsets.only(left: 15),
             decoration: const BoxDecoration(color: Colors.white),
             child: TextFormField(
+              style: const TextStyle(fontWeight: FontWeight.normal),
               maxLength: maxLength,
               readOnly: readOnly ?? false,
               decoration: InputDecoration(
