@@ -1,10 +1,8 @@
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 
 import '../widgets/toast.dart';
 
 pickFile() async {
-  print("hai");
   try {
     // if (await checkPermission()) {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -16,14 +14,13 @@ pickFile() async {
       List<PlatformFile> files = result.files;
       return await validateFile(files);
     } else {
-      // showToast('File not Picked', Colors.red, Colors.white);
+      showToast('File not Picked');
     }
     // } else {
     //   showToast('Permission not granted', Colors.red, Colors.white);
     // }
   } catch (e) {
-    print("error");
-    // showToast('Error picking files: $e', Colors.red, Colors.white);
+    showToast('Error picking files: $e');
   }
 }
 
@@ -31,13 +28,13 @@ validateFile(List<PlatformFile> files) async {
   List selectedFile = [];
   for (PlatformFile file in files) {
     if (file.size > 1024 * 1024 * 10) {
-      // showToast('File size exceeds 10 MB', Colors.red, Colors.white);
+      showToast('File size exceeds 10 MB');
       return;
     }
 
     if (!['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
         .contains(file.extension)) {
-      // showToast('Invalid file type: ${file.name}', Colors.red, Colors.white);
+      showToast('Invalid file type: ${file.name}');
       return;
     }
     selectedFile.add(file.path);
@@ -59,13 +56,13 @@ pickFiles() async {
       List<PlatformFile> files = result.files;
       return await validateFiles(files);
     } else {
-      showToast('File not Picked', Colors.red, Colors.white);
+      showToast('File not Picked');
     }
     // } else {
     //   showToast('Permission not granted', Colors.red, Colors.white);
     // }
   } catch (e) {
-    showToast('Error picking files: $e', Colors.red, Colors.white);
+    showToast('Error picking files: $e');
   }
 }
 
@@ -73,13 +70,13 @@ validateFiles(List<PlatformFile> files) async {
   List selectedFiles = [[], []];
   for (PlatformFile file in files) {
     if (file.size > 1024 * 1024 * 10) {
-      showToast('File size exceeds 10 MB', Colors.red, Colors.white);
+      showToast('File size exceeds 10 MB');
       return;
     }
 
     if (!['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
         .contains(file.extension)) {
-      showToast('Invalid file type: ${file.name}', Colors.red, Colors.white);
+      showToast('Invalid file type: ${file.name}');
       return;
     }
     selectedFiles[0].add(file.path);

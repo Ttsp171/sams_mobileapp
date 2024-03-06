@@ -25,32 +25,29 @@ class CustomTicketButton extends StatelessWidget {
 
 Widget customButtomwithSize(
     buttonText, onButtonClick, height, width, textColor, buttonColor, show) {
-  return Align(
-    alignment: Alignment.bottomCenter,
-    child: SizedBox(
-      height: height,
-      width: width,
-      child: ElevatedButton(
-        onPressed: !show ? onButtonClick : () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+  return SizedBox(
+    height: height,
+    width: width,
+    child: ElevatedButton(
+      onPressed: !show ? onButtonClick : () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: buttonColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: show
-            ? SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: textColor,
-                ),
-              )
-            : Text(
-                buttonText,
-                style: TextStyle(color: textColor),
-              ),
       ),
+      child: show
+          ? SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                color: textColor,
+              ),
+            )
+          : Text(
+              buttonText,
+              style: TextStyle(color: textColor),
+            ),
     ),
   );
 }

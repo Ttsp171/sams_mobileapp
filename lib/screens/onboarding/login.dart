@@ -33,31 +33,99 @@ class _LoginPageState extends State<LoginPage> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(top: 80),
-            alignment: Alignment.center,
-            child: Image.asset(
-              'assets/png/login_logo.png',
-              height: 150,
-              width: 200,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 80),
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/png/login_logo.png',
+                height: 150,
+                width: 200,
+              ),
             ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            height: height * 0.1,
-            width: width * 0.85,
-            child: const Text(
-              Strings.loginWelcomeText,
-              style: TextStyle(fontSize: 30),
+            Container(
+              alignment: Alignment.center,
+              height: height * 0.1,
+              width: width * 0.85,
+              child: const Text(
+                Strings.loginWelcomeText,
+                style: TextStyle(fontSize: 30),
+              ),
             ),
-          ),
-          CustomLoginTextField(hinText: 'Email', onChanged: (val) {}),
-          CustomLoginTextField(hinText: 'Password', onChanged: (val) {}),
-          customFlatButtomwithSize('LOGIN', () {}, height * 0.06, width * 0.85,
-              Colors.white, Colors.orange, false)
-        ],
+            CustomLoginTextField(hinText: 'Email', onChanged: (val) {}),
+            CustomLoginTextField(hinText: 'Password', onChanged: (val) {}),
+            // Row(
+            //   children: [
+            //     Checkbox(
+            //         value: true,
+            //         onChanged: (val) {},
+            //         checkColor: Colors.purple,
+            //         side: const BorderSide(width: 0.5, color: Colors.grey),
+            //         shape: BeveledRectangleBorder(
+            //             borderRadius: BorderRadius.circular(5),
+            //             side:
+            //                 const BorderSide(width: 0.5, color: Colors.black)),
+            //         fillColor:
+            //             const MaterialStatePropertyAll(Colors.transparent)),
+            //     const Text("data"),
+            //   ],
+            // ),
+            customFlatButtomwithSize('LOGIN', () {}, height * 0.06,
+                width * 0.85, Colors.white, Colors.orange, false)
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        width: width,
+        height: height * 0.12,
+        color: Colors.orange,
+        child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                Strings.getinTouchText,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+                    child: Text(
+                      Strings.emailOffical,
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.phone,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+                    child: Text(
+                      Strings.phoneOfficial,
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ]),
       ),
     );
   }

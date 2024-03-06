@@ -96,6 +96,14 @@ class CustomTextFieldWithLabel extends StatelessWidget {
                     color: Colors.red,
                   ),
                 ),
+              if (errorText != null)
+                Text(
+                  "   $errorText",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red.shade600,
+                  ),
+                ),
             ],
           ),
           SizedBox(
@@ -109,7 +117,6 @@ class CustomTextFieldWithLabel extends StatelessWidget {
               readOnly: readOnly ?? false,
               decoration: InputDecoration(
                   border: InputBorder.none,
-                  errorText: errorText,
                   hintText: hintText,
                   hintStyle: const TextStyle(color: Colors.grey)),
               onChanged: onChanged,

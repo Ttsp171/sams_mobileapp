@@ -8,6 +8,7 @@ class CustomDropDown extends StatefulWidget {
   final bool isRequired;
   final ValueChanged onChanged;
   final Function getValue;
+  final String? errorText;
 
   const CustomDropDown(
       {super.key,
@@ -17,7 +18,8 @@ class CustomDropDown extends StatefulWidget {
       required this.dropDownData,
       required this.isRequired,
       required this.onChanged,
-      required this.getValue});
+      required this.getValue,
+      this.errorText});
 
   @override
   State<CustomDropDown> createState() => _CustomDropDownState();
@@ -55,20 +57,31 @@ class _CustomDropDownState extends State<CustomDropDown> {
                   color: Colors.black,
                 ),
               ),
-              const Text(
-                " *",
-                style: TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.red,
+              if (widget.isRequired)
+                const Text(
+                  " *",
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    color: Colors.red,
+                  ),
                 ),
-              ),
+              if (widget.errorText != null)
+                Text(
+                  "   ${widget.errorText}",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red.shade600,
+                  ),
+                ),
             ],
           ),
           SizedBox(
             height: height * 0.01,
           ),
           Container(
-            decoration: const BoxDecoration(color: Colors.white),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
             child: ButtonTheme(
               alignedDropdown: false,
               child: DropdownButtonHideUnderline(

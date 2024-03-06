@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-void showToast(message, bgColor, textColor) {
-  FocusManager.instance.primaryFocus?.unfocus();
+void showToast(String msg) {
   Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      msg: msg,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: bgColor ?? Colors.white,
-      textColor: textColor ?? Colors.grey);
+      backgroundColor: Colors.red.shade50,
+      textColor: Colors.white);
+}
+
+void showSuccessToast(String msg) {
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.grey.shade800,
+      textColor: Colors.white);
 }
