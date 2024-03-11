@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/file_pick_controllers.dart';
 import 'package:sams/services/api.dart';
@@ -28,7 +30,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
       roomDropDown = [],
       roomDropDownValues = [],
       subjectDropDown = [],
-      subjectDropDownValues = ["Subject 1", "Subject 2", "Subject 3"],
+      subjectDropDownValues = [],
       attachment = [];
 
   String? employeeError,
@@ -48,7 +50,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
   void initState() {
     super.initState();
     getDropDownData('/api/get-fmticket-company', "company", context);
-    // getDropDownData('/api/get-fmticket-company', "subject", context);
+    getDropDownData('/api/get-fmticket-subject', "subject", context);
   }
 
   getDropDownData(endpoint, field, context) async {
@@ -58,6 +60,8 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
         setState(() {
           companyDropDown = res["data"]["data"];
         });
+        subjectDropDown = res["data"]["data"];
+
         for (var company in res["data"]["data"]) {
           setState(() {
             companyDropDownValues.add(company["company_name"]);
@@ -94,16 +98,18 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
           });
         }
       }
-      // if (field == "subject") {
-      //   setState(() {
-      //     subjectDropDown = res["data"]["data"];
-      //   });
-      //   for (var subject in res["data"]["data"]) {
-      //     setState(() {
-      //       subjectDropDownValues.add(subject["building_no"]);
-      //     });
-      //   }
-      // }
+      if (field == "subject") {
+        setState(() {
+          subjectDropDown = res["data"]["data"];
+        });
+        for (var subject in res["data"]["data"]) {
+          subject.forEach((key, value) {
+            setState(() {
+              subjectDropDownValues.add(value);
+            });
+          });
+        }
+      }
     } else {
       showToast("Something went Wrong in $field");
     }
@@ -262,7 +268,8 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
       setState(() {
         showButton = false;
       });
-      showSuccessToast("Work Order Created Successfully");
+      var message = json.decode(res["data"]);
+      showSuccessToast(message["message"]);
       Navigator.pop(context);
     } else {
       showToast("Error Occured");
@@ -421,7 +428,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
               CustomTextFieldWithLabel(
                   errorText: messageError,
                   labelText: 'Message',
-                  required: false,
+                  required: true,
                   hintText: "Please enter Message",
                   onChanged: (val) {
                     setState(() {

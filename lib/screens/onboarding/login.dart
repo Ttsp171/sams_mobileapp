@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
 import 'package:sams/screens/onboarding/ticketing.dart';
@@ -7,6 +5,7 @@ import 'package:sams/widgets/buttons.dart';
 import 'package:sams/widgets/textfield.dart';
 
 import '../../utils/strings.dart';
+import 'user_login.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -134,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
             child: CustomTicketButton(
                 buttonText: Strings.ticketingButtonText,
                 onPressed: () {
-                  navigateWithRoute(context, const RegisterTicketing());
+                  navigateWithRoute(context, const UserLoginPage());
                 }),
           ),
         ],

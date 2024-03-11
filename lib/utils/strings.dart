@@ -1,5 +1,6 @@
 class Strings {
   static const String loginWelcomeText = "Login to continue";
+  static const String userLoginWelcomeText = "Welcome back! Glad to see you, Again!";
   static const String ticketingButtonText = "Ticketing";
   static const String emailText = "Email";
   static const String passwordText = "Password";
