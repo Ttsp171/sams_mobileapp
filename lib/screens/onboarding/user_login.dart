@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
 import 'package:sams/screens/onboarding/ticketing.dart';
+import 'package:sams/services/api.dart';
 import 'package:sams/widgets/buttons.dart';
 import 'package:sams/widgets/textfield.dart';
+import 'package:sams/widgets/toast.dart';
 
 import '../../utils/strings.dart';
 
@@ -26,10 +30,10 @@ class _UserLoginPageState extends State<UserLoginPage> {
     await _googleSignIn.signOut();
     final GoogleSignInAccount? googleSignInAccount =
         await _googleSignIn.signIn();
-   
+
     final GoogleSignInAuthentication googleSignInAuthentication =
         await googleSignInAccount!.authentication;
-        
+
     final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken);
@@ -38,10 +42,22 @@ class _UserLoginPageState extends State<UserLoginPage> {
     setState(() {
       _showGoogleButton = false;
     });
-    print(userCredentials.user!.displayName);
-    print(userCredentials.user!.email);
-    print(userCredentials.user!.uid);
-    navigateWithRoute(context,  RegisterTicketing(employeeName:userCredentials.user!.displayName));
+    try {
+      final res =
+          await HttpServices().postWithAttachments('/api/google-login', {
+        'email': userCredentials.user!.email.toString(),
+        'user_name': userCredentials.user!.displayName.toString(),
+        'google_token': userCredentials.user!.uid.toString()
+      }, []);
+      if (res["status"] == 200) {
+        var message = json.decode(res["data"]);
+        showSuccessToast("${message["message"]} from ${userCredentials.user!.email}");
+        navigateWithRoute(context,
+            RegisterTicketing(employeeName: userCredentials.user!.displayName));
+      }
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
