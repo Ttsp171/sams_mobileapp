@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sams/controllers/navigation_controllers.dart';
+import 'package:sams/screens/onboarding/ticketing.dart';
 import 'package:sams/widgets/buttons.dart';
 import 'package:sams/widgets/textfield.dart';
 
@@ -12,7 +16,33 @@ class UserLoginPage extends StatefulWidget {
 }
 
 class _UserLoginPageState extends State<UserLoginPage> {
-  bool isRemember = false;
+  bool isRemember = false, _showGoogleButton = false;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  signWithGoogle(context) async {
+    setState(() {
+      _showGoogleButton = true;
+    });
+    await _googleSignIn.signOut();
+    final GoogleSignInAccount? googleSignInAccount =
+        await _googleSignIn.signIn();
+   
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount!.authentication;
+        
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken);
+    final userCredentials =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    setState(() {
+      _showGoogleButton = false;
+    });
+    print(userCredentials.user!.displayName);
+    print(userCredentials.user!.email);
+    print(userCredentials.user!.uid);
+    navigateWithRoute(context,  RegisterTicketing(employeeName:userCredentials.user!.displayName));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,24 +70,54 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   width: width * 0.85,
                   child: const Text(
                     Strings.userLoginWelcomeText,
-                    style: TextStyle(fontSize: 30),
+                    style: TextStyle(fontSize: 30, fontFamily: "Serif"),
                   ),
                 ),
                 CustomLoginTextField(hinText: 'Email', onChanged: (val) {}),
                 CustomLoginTextField(hinText: 'Password', onChanged: (val) {}),
-               Padding(
+                Padding(
                   padding: const EdgeInsets.all(10),
                   child: customFlatButtomwithSize('LOGIN', () {}, height * 0.06,
                       width * 0.85, Colors.white, Colors.orange, false),
                 ),
-                Row(children: [
-                  SizedBox(
-                    width: width*0.40,
-                    child: const Divider(color: Colors.grey,),),
-                       SizedBox(
-                    width: width*0.40,
-                    child: const Divider(color: Colors.grey,),),
-                ],),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: width * 0.30,
+                        child: const Divider(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const Text(
+                        "Or Login with",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      SizedBox(
+                        width: width * 0.30,
+                        child: const Divider(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                googleButton(() => signWithGoogle(context), _showGoogleButton),
+                // GestureDetector(
+                //   onTap: ()=>signWithGoogle(context),
+                //   child: Container(
+                //     height: 50,
+                //     width: 100,
+                //     margin: const EdgeInsets.symmetric(vertical: 20),
+                //     decoration: BoxDecoration(
+                //         border: Border.all(color: Colors.grey, width: 1),
+                //         borderRadius: BorderRadius.circular(15)),
+                //     child: Image.asset("assets/png/google_logo.png"),
+                //   ),
+                // )
               ],
             ),
           ),

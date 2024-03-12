@@ -119,6 +119,7 @@ class CustomTextFieldWithLabel extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.normal),
               maxLength: maxLength,
               readOnly: readOnly ?? false,
+              initialValue: initialValue??"",
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: hintText,

@@ -83,3 +83,52 @@ Widget customFlatButtomwithSize(
     ),
   );
 }
+
+Widget googleButton(onButtonClick, show) {
+  return GestureDetector(
+    onTap:show?(){}: onButtonClick,
+    child: Container(
+      height: 50,
+      width: 100,
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.circular(15)),
+      child:show
+          ?  Container(
+              height: 20,
+              width: 20,
+              padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 35),
+              child: const CircularProgressIndicator(
+                color: Colors.red,
+                backgroundColor: Colors.yellow,
+              ),
+            ): Image.asset("assets/png/google_logo.png"),
+    ),
+  );
+  // return SizedBox(
+  //   height: height,
+  //   width: width,
+  //   child: ElevatedButton(
+  //     onPressed: !show ? onButtonClick : () {},
+  //     style: ElevatedButton.styleFrom(
+  //       backgroundColor: buttonColor,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(20),
+  //       ),
+  //     ),
+      // child: show
+      //     ? SizedBox(
+      //         height: 20,
+      //         width: 20,
+      //         child: CircularProgressIndicator(
+      //           color: textColor,
+      //         ),
+      //       )
+  //         : Text(
+  //             buttonText,
+  //             style: TextStyle(color: textColor),
+  //           ),
+  //   ),
+  // );
+}

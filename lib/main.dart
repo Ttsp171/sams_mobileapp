@@ -5,9 +5,9 @@ import 'package:sams/firebase_options.dart';
 import 'seldom_app.dart';
 
 Future<void> main() async {
-
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
   runApp(const SeldomApp());
 }

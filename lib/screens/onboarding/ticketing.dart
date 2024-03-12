@@ -12,7 +12,8 @@ import '../../utils/strings.dart';
 import '../../widgets/buttons.dart';
 
 class RegisterTicketing extends StatefulWidget {
-  const RegisterTicketing({super.key});
+  final String? employeeName;
+  const RegisterTicketing({super.key, this.employeeName});
 
   @override
   State<RegisterTicketing> createState() => _RegisterTicketingState();
@@ -49,6 +50,11 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
   @override
   void initState() {
     super.initState();
+    if (widget.employeeName != null) {
+      setState(() {
+        employeeName = widget.employeeName??"";
+      });
+    }
     getDropDownData('/api/get-fmticket-company', "company", context);
     getDropDownData('/api/get-fmticket-subject', "subject", context);
   }
@@ -297,6 +303,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   )),
               CustomTextFieldWithLabel(
+                initialValue: employeeName,
                   errorText: employeeError,
                   labelText: 'Employee Name:',
                   required: true,
