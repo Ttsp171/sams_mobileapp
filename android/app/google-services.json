@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "634078606915",
+    "project_id": "sams-1b591",
+    "storage_bucket": "sams-1b591.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634078606915:android:53d50066d23c2bc06d46f6",
+        "android_client_info": {
+          "package_name": "com.seldom.sams"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "634078606915-pa008k3o54fvtsbqbphoj413lij1bgvd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJiXwj0XI0ZpXPEp2sTERNRkhmev0uqhY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "634078606915-pa008k3o54fvtsbqbphoj413lij1bgvd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "634078606915-4e26hau3mllp8b45to9m3a5rbedkmht1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.seldom.sams"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

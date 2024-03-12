@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/screens/onboarding/ticketing.dart';
 import 'package:sams/widgets/buttons.dart';
 import 'package:sams/widgets/textfield.dart';
 

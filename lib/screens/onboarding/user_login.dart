@@ -50,6 +50,14 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   child: customFlatButtomwithSize('LOGIN', () {}, height * 0.06,
                       width * 0.85, Colors.white, Colors.orange, false),
                 ),
+                Row(children: [
+                  SizedBox(
+                    width: width*0.40,
+                    child: const Divider(color: Colors.grey,),),
+                       SizedBox(
+                    width: width*0.40,
+                    child: const Divider(color: Colors.grey,),),
+                ],),
               ],
             ),
           ),
