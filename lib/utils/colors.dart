@@ -6,7 +6,7 @@ class ColorTheme {
   static Color textfieldBlack = const Color(0xff0A0A0A);
   static Color lightBlack = const Color(0xff001D3D);
   static Color buttonPrimaryColor = const Color(0xff33B5CC);
-  static Color primaryColor = const Color.fromRGBO(255, 167, 23, 1);
+  static Color primaryColor = Color(0xFFFFA717);
   static Color failRedDark = const Color(0xffDC3545);
   static Color darkGreen = const Color(0xff17A2BB);
   static Color darkYellow = const Color(0xffFFCE00);
