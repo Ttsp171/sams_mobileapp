@@ -27,10 +27,21 @@ class CustomDropDown extends StatefulWidget {
 
 class _CustomDropDownState extends State<CustomDropDown> {
   String? initialValue;
+  bool firstTime = true;
 
   @override
   void initState() {
     super.initState();
+    if (widget.initialValue != null) {
+      setState(() {
+        initialValue = widget.initialValue ?? "";
+      });
+    }
+    // Future.delayed(const Duration(seconds: 1), () {
+    //   setState(() {
+    //     firstTime = false;
+    //   });
+    // });
   }
 
   @override

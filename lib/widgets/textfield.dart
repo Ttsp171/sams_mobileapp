@@ -4,11 +4,14 @@ class CustomLoginTextField extends StatefulWidget {
   final String hinText;
   final ValueChanged onChanged;
   final String? errorText;
+  final IconData? suffixIcon;
+  final VoidCallback? suffixIconPressed;
+  final bool? obscureText;
   const CustomLoginTextField(
       {super.key,
       required this.hinText,
       required this.onChanged,
-      this.errorText});
+      this.errorText, this.suffixIcon, this.suffixIconPressed, this.obscureText});
 
   @override
   State<CustomLoginTextField> createState() => _CustomLoginTextFieldState();
@@ -23,18 +26,23 @@ class _CustomLoginTextFieldState extends State<CustomLoginTextField> {
       width: width * 0.85,
       height: height * 0.10,
       child: TextFormField(
+        
+          obscureText:widget.obscureText??false,
+      
         decoration: InputDecoration(
+        
+          suffixIcon: IconButton(icon: Icon(widget.suffixIcon),onPressed: widget.suffixIconPressed,),
           filled: true,
           fillColor: Colors.transparent,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(80),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(80),
             borderSide: const BorderSide(color: Colors.grey),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(80),
             borderSide: const BorderSide(color: Colors.grey),
           ),
           labelText: widget.hinText,
@@ -119,7 +127,7 @@ class CustomTextFieldWithLabel extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.normal),
               maxLength: maxLength,
               readOnly: readOnly ?? false,
-              initialValue: initialValue??"",
+              initialValue: initialValue ?? "",
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: hintText,

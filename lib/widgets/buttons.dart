@@ -23,7 +23,7 @@ class CustomTicketButton extends StatelessWidget {
   }
 }
 
-Widget customButtomwithSize(
+Widget customButtonWithSize(
     buttonText, onButtonClick, height, width, textColor, buttonColor, show) {
   return SizedBox(
     height: height,
@@ -53,7 +53,7 @@ Widget customButtomwithSize(
 }
 
 Widget customFlatButtomwithSize(
-    buttonText, onButtonClick, height, width, textColor, buttonColor, show) {
+    buttonText, onButtonClick, height, width, textColor,borderColor, buttonColor, show) {
   return Align(
     alignment: Alignment.bottomCenter,
     child: SizedBox(
@@ -64,7 +64,9 @@ Widget customFlatButtomwithSize(
         style: ElevatedButton.styleFrom(
           backgroundColor: buttonColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+
+            borderRadius: BorderRadius.circular(50),
+            side: BorderSide(color: borderColor)
           ),
         ),
         child: show
@@ -101,34 +103,8 @@ Widget googleButton(onButtonClick, show) {
               padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 35),
               child: const CircularProgressIndicator(
                 color: Colors.red,
-                backgroundColor: Colors.yellow,
               ),
             ): Image.asset("assets/png/google_logo.png"),
     ),
   );
-  // return SizedBox(
-  //   height: height,
-  //   width: width,
-  //   child: ElevatedButton(
-  //     onPressed: !show ? onButtonClick : () {},
-  //     style: ElevatedButton.styleFrom(
-  //       backgroundColor: buttonColor,
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(20),
-  //       ),
-  //     ),
-      // child: show
-      //     ? SizedBox(
-      //         height: 20,
-      //         width: 20,
-      //         child: CircularProgressIndicator(
-      //           color: textColor,
-      //         ),
-      //       )
-  //         : Text(
-  //             buttonText,
-  //             style: TextStyle(color: textColor),
-  //           ),
-  //   ),
-  // );
 }
