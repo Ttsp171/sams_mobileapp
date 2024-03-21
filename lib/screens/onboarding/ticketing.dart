@@ -521,7 +521,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
                           submitForm();
                         });
                       }, height * 0.05, width * 0.85, Colors.white,
-                          Colors.purple, false),
+                          Colors.purple, showButton),
                     ),
                   ],
                 ),

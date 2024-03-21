@@ -1,5 +1,5 @@
 class SharedPreferanceKeyString {
-  final String isBackGroundServiceActive = "isBackGroundServiceActive";
+  final String versionAvailable = "isBackGroundServiceActive";
  
 
 }

@@ -126,7 +126,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                 ),
               )),
           Padding(
-            padding: const EdgeInsets.only(top: 30, bottom: 30),
+            padding: const EdgeInsets.only(top: 10, bottom: 30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
