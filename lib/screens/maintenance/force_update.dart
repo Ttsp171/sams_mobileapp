@@ -1,10 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:open_store/open_store.dart';
-
-import 'package:sams/utils/colors.dart';
 
 import '../../widgets/bottomsheet.dart';
 
@@ -14,7 +11,7 @@ class ForceUpdate extends StatelessWidget {
   openStore(context) {
     if (Platform.isAndroid) {
       OpenStore.instance.open(
-        androidAppBundleId: 'io.ionic.pz_owner',
+        androidAppBundleId: 'com.seldom.sams',
       );
     } else if (Platform.isIOS) {
       OpenStore.instance.open(

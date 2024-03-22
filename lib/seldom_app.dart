@@ -6,11 +6,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:sams/screens/maintenance/force_update,dart';
 import 'package:sams/screens/maintenance/maintenance.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/prefs.dart';
+import 'screens/maintenance/force_update.dart';
 import 'screens/maintenance/offline.dart';
 import 'screens/onboarding/login.dart';
 import 'screens/onboarding/splash.dart';
