@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
@@ -49,12 +50,13 @@ class _UserLoginPageState extends State<UserLoginPage> {
       }, []);
       if (res["status"] == 200) {
         var resData = json.decode(res["data"]);
-       resData["data"]["is_registered"]=="yes" ?showSuccessToast(
-            "Welcome back ${userCredentials.user!.email}"):showSuccessToast(
-            "${resData["message"]??""} from ${userCredentials.user!.email}");
+        resData["data"]["is_registered"] == "yes"
+            ? showSuccessToast("Welcome back ${userCredentials.user!.email}")
+            : showSuccessToast(
+                "${resData["message"] ?? ""} from ${userCredentials.user!.email}");
         Navigator.pop(context);
-        navigateWithRoute(context,
-            RegisterTicketing(userData: resData["data"]??{}));
+        navigateWithRoute(
+            context, RegisterTicketing(userData: resData["data"] ?? {}));
         setState(() {
           _showGoogleButton = false;
         });
@@ -76,6 +78,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     return Container(
+      // margin: EdgeInsets.only(bottom: widget.h * 0.1),
       padding: EdgeInsets.symmetric(
           vertical: widget.h * 0.1, horizontal: widget.w * 0.05),
       decoration: const BoxDecoration(
@@ -125,27 +128,23 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   ],
                 ),
               )),
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: customFlatButtomwithSize('Cancel', () {
+          SafeArea(
+            child: Container(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  customFlatButtomwithSize('Cancel', () {
                     Navigator.pop(context);
                     //  navigateWithRoute(context, const UserLoginPage());
                   }, h * 0.06, w * 0.30, Colors.orange, Colors.orange,
                       Colors.white, false),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: customFlatButtomwithSize('Confirm', () {
+                  customFlatButtomwithSize('Confirm', () {
                     signWithGoogle(context);
                   }, h * 0.06, w * 0.30, Colors.white, Colors.white,
                       Colors.orange, _showGoogleButton),
-                ),
-              ],
+                ],
+              ),
             ),
           )
         ],
