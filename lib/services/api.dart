@@ -2,12 +2,32 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/env.dart';
+import '../seldom_app.dart';
 import '../widgets/toast.dart';
 
 class HttpServices {
   String baseUrl = Env().baseUrl;
+
+  Future getWithToken(endpoint, context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl$endpoint'), headers: <String, String>{
+        'Accept-Language': 'EN-US',
+        'Authorization': "Bearer ${prefs.getString(prefKey.token)}"
+      });
+      var data = json.decode(response.body);
+      return {"status": response.statusCode, "data": data};
+    } catch (e) {
+      return {
+        "status": 700,
+        "data": {"message": "Internal Server Error"}
+      };
+    }
+  }
 
   Future get(String url, BuildContext? context) async {
     try {
@@ -21,6 +41,24 @@ class HttpServices {
       return {"status": response.statusCode, "data": data};
     } catch (e) {
       showToast("Internal Server Error");
+    }
+  }
+
+  Future authBoardPost(endpoint, body) async {
+    try {
+      final response = await http.post(Uri.parse('$baseUrl$endpoint'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode(body));
+      var data = json.decode(response.body);
+      return {"status": response.statusCode, "data": data};
+    } catch (e) {
+      return {
+        "status": 700,
+        "data": {"message": "Internal Server Error"}
+      };
     }
   }
 

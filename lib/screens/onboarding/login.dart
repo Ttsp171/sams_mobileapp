@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
+import 'package:sams/screens/dashboard/dashboard_page.dart';
 import 'package:sams/screens/maintenance/privacy_policy.dart';
+import 'package:sams/seldom_app.dart';
 import 'package:sams/widgets/bottomsheet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/api.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/textfield.dart';
+import '../../widgets/toast.dart';
 import 'user_login.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,8 +22,94 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isRemember = false,
       passVisible = true,
-      showLogin = false,
-      showTicketing = false;
+      showTicketing = false,
+      _show = false,
+      _isFirstTime = true;
+  String email = "", password = "";
+  String? _emailError;
+  String? _passwordError;
+
+  void _validateEmail(String value) {
+    if (value.isEmpty) {
+      setState(() {
+        _emailError = 'Email is required';
+      });
+    } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+        .hasMatch(value)) {
+      setState(() {
+        _emailError = 'Enter a valid email';
+      });
+    } else {
+      setState(() {
+        _emailError = null;
+      });
+    }
+  }
+
+  void _validatePassword(String value) {
+    if (value.isEmpty) {
+      setState(() {
+        _passwordError = 'Password is required';
+      });
+    } else {
+      setState(() {
+        _passwordError = null;
+      });
+    }
+  }
+
+  void _submitForm() {
+    _validateEmail(email);
+    _validatePassword(password);
+
+    if (_emailError == null && _passwordError == null) {
+      loginUser(context);
+    } else {
+      setState(() {
+        _show = false;
+      });
+    }
+  }
+
+  loginUser(context) async {
+    print("**********LOGIN CALL************");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final res = await HttpServices().authBoardPost(
+        '/api/user-login', {'email': email, 'password': password});
+    if (res["status"] == 200) {
+      await prefs.setString(prefKey.token, res["data"]["data"]["token"] ?? "");
+      if (isRemember) {
+        await prefs.setBool(prefKey.isRemember, isRemember);
+        await prefs.setString(prefKey.u1, email);
+        await prefs.setString(prefKey.u2, password);
+      }
+      getUserDetails(context);
+    } else {
+      setState(() {
+        _show = false;
+      });
+      showToast(res["data"]["message"]);
+    }
+  }
+
+  getUserDetails(context) async {
+    final res = await HttpServices().getWithToken('/api/user-details', context);
+    if (res["status"] == 200) {
+      setState(() {
+        _show = false;
+      });
+      navigateWithoutRoute(
+          context,
+          DashBoardMain(
+            userData: res["data"]["data"],
+          ));
+    } else {
+      setState(() {
+        _show = false;
+      });
+      showToast(res["data"]["message"]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Container(
-                      margin:
-                          EdgeInsets.only(left: w * 0.10, bottom: h * 0.02),
+                      margin: EdgeInsets.only(left: w * 0.10, bottom: h * 0.02),
                       child: const Text(
                         "Login",
                         style: TextStyle(
@@ -85,12 +175,29 @@ class _LoginPageState extends State<LoginPage> {
                   Container(
                       alignment: Alignment.center,
                       child: CustomLoginTextField(
-                          hinText: "Email", onChanged: (val) {})),
+                          hinText: "Email",
+                          errorText: _emailError,
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                            if (!_isFirstTime) {
+                              _validateEmail(val);
+                            }
+                          })),
                   Container(
                       alignment: Alignment.center,
                       child: CustomLoginTextField(
                         hinText: 'Password',
-                        onChanged: (val) {},
+                        errorText: _passwordError,
+                        onChanged: (val) {
+                          setState(() {
+                            password = val;
+                          });
+                          if (!_isFirstTime) {
+                            _validatePassword(val);
+                          }
+                        },
                         suffixIcon: passVisible
                             ? Icons.visibility
                             : Icons.visibility_off,
@@ -101,7 +208,6 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         obscureText: passVisible,
                       )),
-              
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
@@ -122,8 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 20,
                                     height: 20,
                                     decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
                                             width: 1, color: Colors.black)),
                                     child: const Align(
@@ -142,8 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: 20,
                                     height: 20,
                                     decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
                                             width: 1, color: Colors.black)),
                                   ),
@@ -154,9 +258,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         TextButton(
-                            onPressed: () {
-                              // navigateWithRoute(context, const PrivacyPolicy());
-                            },
+                            onPressed: () {},
                             child: const Text(
                               "Forgot Password ?",
                               style: TextStyle(color: Colors.blue),
@@ -169,15 +271,14 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
-                        child: customFlatButtomwithSize(
-                            'LOGIN',
-                            () {},
-                            h * 0.06,
-                            w * 0.42,
-                            Colors.white,
-                            Colors.white,
-                            Colors.orange,
-                            showLogin),
+                        child: customFlatButtomwithSize('LOGIN', () {
+                          setState(() {
+                            _show = true;
+                            _isFirstTime = false;
+                          });
+                          _submitForm();
+                        }, h * 0.06, w * 0.42, Colors.white, Colors.white,
+                            Colors.orange, _show),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(10),
@@ -188,93 +289,38 @@ class _LoginPageState extends State<LoginPage> {
                                 h: h * 0.50,
                                 w: w,
                               ));
-                          //  navigateWithRoute(context, const UserLoginPage());
                         }, h * 0.06, w * 0.42, Colors.orange, Colors.orange,
                             Colors.white, showTicketing),
                       ),
                     ],
                   ),
-                  // Container(
-                  //   alignment: Alignment.bottomCenter,
-                  //   margin: EdgeInsets.only(bottom: h * 0.01),
-                  //   child: Column(
-                  //     children: [
-                  //       const Text(
-                  //           "By creating an account, you agree with our"),
-                  //       TextButton(
-                  //           onPressed: () {
-                  //             navigateWithRoute(
-                  //                 context, const PrivacyPolicy());
-                  //           },
-                  //           child: const Text(
-                  //             "Terms of Service & Privacy Policy",
-                  //             style: TextStyle(color: Colors.blue),
-                  //           ))
-                  //     ],
-                  //   ),
-                  // ),
-              
-                  // Image.asset("assets/jpg/touch_back.jpg",height: h*0.30,)
                 ],
               ),
-                Container(
+              Container(
                 alignment: Alignment.center,
-                margin: EdgeInsets.only(top: h*0.75),
+                margin: EdgeInsets.only(top: h * 0.75),
                 child: Column(
                   children: [
-                    const Text("By creating an account, you agree with our",style: TextStyle(fontFamily: "Serif",fontSize: 18),),
-                      TextButton(
-                              onPressed: () {
-                                navigateWithRoute(context, const PrivacyPolicy());
-                              },
-                              child: const Text(
-                                "Terms of Service & Privacy Policy",
-                                style: TextStyle(fontFamily: "Serif",fontSize: 18,color: Colors.blue),
-                              ))
-
+                    const Text(
+                      "By creating an account, you agree with our",
+                      style: TextStyle(fontFamily: "Serif", fontSize: 18),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          navigateWithRoute(context, const PrivacyPolicy());
+                        },
+                        child: const Text(
+                          "Terms of Service & Privacy Policy",
+                          style: TextStyle(
+                              fontFamily: "Serif",
+                              fontSize: 18,
+                              color: Colors.blue),
+                        ))
                   ],
                 ),
               ),
             ],
           ),
-          
-          // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          // floatingActionButton:  Container(
-          //     alignment: Alignment.bottomCenter,
-          //     margin: EdgeInsets.only(bottom: h*0.01),
-          //     child: Column(
-          //       children: [
-          //         const Text("By creating an account, you agree with our"),
-          //           TextButton(
-          //                   onPressed: () {
-          //                     navigateWithRoute(context, const PrivacyPolicy());
-          //                   },
-          //                   child: const Text(
-          //                     "Terms of Service & Privacy Policy",
-          //                     style: TextStyle(color: Colors.blue),
-          //                   ))
-
-          //       ],
-          //     ),
-          //   ),
-          // bottomNavigationBar:  Container(
-          //     alignment: Alignment.bottomCenter,
-          //     margin: EdgeInsets.only(bottom: h*0.01),
-          //     child: Column(
-          //       children: [
-          //         const Text("By creating an account, you agree with our"),
-          //           TextButton(
-          //                   onPressed: () {
-          //                     navigateWithRoute(context, const PrivacyPolicy());
-          //                   },
-          //                   child: const Text(
-          //                     "Terms of Service & Privacy Policy",
-          //                     style: TextStyle(color: Colors.blue),
-          //                   ))
-
-          //       ],
-          //     ),
-          //   ),
         ),
       ),
     );

@@ -10,11 +10,13 @@ import 'package:sams/screens/maintenance/maintenance.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/prefs.dart';
+import 'screens/dashboard/dashboard_page.dart';
 import 'screens/maintenance/force_update.dart';
 import 'screens/maintenance/offline.dart';
 import 'screens/onboarding/login.dart';
 import 'screens/onboarding/splash.dart';
 import 'services/api.dart';
+import 'widgets/toast.dart';
 
 SharedPreferanceKeyString prefKey = SharedPreferanceKeyString();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -28,13 +30,15 @@ class SeldomApp extends StatefulWidget {
 }
 
 class _SeldomAppState extends State<SeldomApp> {
-  bool isSplash = false;
+  bool isSplash = true;
   bool appMaintenence = false;
   bool appUpdate = false;
   bool appForceUpdate = false;
   bool isDeviceConnected = false;
+  bool isDashBoard = false;
   late StreamSubscription subscription;
   ValueNotifier<bool> isNetwork = ValueNotifier<bool>(false);
+  Map userDetails = {};
 
   @override
   void initState() {
@@ -116,7 +120,7 @@ class _SeldomAppState extends State<SeldomApp> {
         {"os": getDeviceType()[0], "version": getDeviceType()[1]}, []);
     if (res["status"] == 200) {
       var versionData = json.decode(res["data"]);
-      // getNewToken(true);
+      getIsRemember(context);
       setState(() {
         appUpdate = versionData["data"]["normal_update"];
         appForceUpdate = versionData["data"]["force_update"];
@@ -139,11 +143,68 @@ class _SeldomAppState extends State<SeldomApp> {
     }
   }
 
+  getIsRemember(context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var isRemem = prefs.getBool(prefKey.isRemember) ?? false;
+    if (isRemem) {
+      loginUser(context);
+    } else {
+      prefs.clear();
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          isSplash = false;
+        });
+      });
+    }
+  }
+
+  loginUser(context) async {
+    print("**********RE LOGIN CALL************");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString(prefKey.u1);
+    var password = prefs.getString(prefKey.u2);
+    final res = await HttpServices().authBoardPost(
+        '/api/user-login', {'email': email, 'password': password});
+    if (res["status"] == 200) {
+      await prefs.setString(prefKey.token, res["data"]["data"]["token"] ?? "");
+      getUserDetails(context);
+    } else {
+        Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          isSplash = false;
+        });
+      });
+      showToast(res["data"]["message"]);
+    }
+  }
+
+  getUserDetails(context) async {
+    final res = await HttpServices().getWithToken('/api/user-details', context);
+    if (res["status"] == 200) {
+      setState(() {
+        userDetails = res["data"]["data"];
+        isDashBoard = true;
+      });
+        Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          isSplash = false;
+        });
+      });
+    } else {
+        Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          isSplash = false;
+        });
+      });
+      showToast(res["data"]["message"]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey,
+      navigatorKey: navigatorKey,
       home: isSplash
           ? const SplashScreen()
           : !isNetwork.value
@@ -152,20 +213,9 @@ class _SeldomAppState extends State<SeldomApp> {
                   ? const Maintenance()
                   : appForceUpdate
                       ? const ForceUpdate()
-                      : const LoginPage(),
+                      : isDashBoard
+                          ? DashBoardMain(userData: userDetails)
+                          : const LoginPage(),
     );
   }
 }
-
-// ? const SplashScreen()
-//             : !isNetwork.value
-//                 ? const OfflinePage()
-//                 : appMaintenence
-//                     ? const Maintenance()
-//                     : appForceUpdate
-//                         ? const ForceUpdate()
-//                         : _keepmeSigned
-//                             ? const Dashboard(
-//                                 firstTime: true,
-//                               )
-//                             : const LoginScreen(),
