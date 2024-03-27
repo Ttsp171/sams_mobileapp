@@ -78,31 +78,14 @@ class _LoginPageState extends State<LoginPage> {
         '/api/user-login', {'email': email, 'password': password});
     if (res["status"] == 200) {
       await prefs.setString(prefKey.token, res["data"]["data"]["token"] ?? "");
-      if (isRemember) {
-        await prefs.setBool(prefKey.isRemember, isRemember);
-        await prefs.setString(prefKey.u1, email);
-        await prefs.setString(prefKey.u2, password);
-      }
-      getUserDetails(context);
-    } else {
-      setState(() {
-        _show = false;
-      });
-      showToast(res["data"]["message"]);
-    }
-  }
+      await prefs.setBool(prefKey.isRemember, isRemember);
+      // await prefs.setString(prefKey.u1, email);
+      // await prefs.setString(prefKey.u2, password);
 
-  getUserDetails(context) async {
-    final res = await HttpServices().getWithToken('/api/user-details', context);
-    if (res["status"] == 200) {
       setState(() {
         _show = false;
       });
-      navigateWithoutRoute(
-          context,
-          DashBoardMain(
-            userData: res["data"]["data"],
-          ));
+      navigateWithoutRoute(context, const DashBoardMain());
     } else {
       setState(() {
         _show = false;

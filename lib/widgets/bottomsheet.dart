@@ -22,7 +22,8 @@ Future<bool> showExitPopup(context) async {
   return await showDialog(
         context: context,
         builder: (context) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(1.0)),
           child: AlertDialog(
             title: const Text(
               'Exit App',
@@ -45,7 +46,8 @@ Future<bool> showExitPopup(context) async {
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all<Color>(Colors.white),
-                        backgroundColor:const MaterialStatePropertyAll(Colors.orange),
+                      backgroundColor:
+                          const MaterialStatePropertyAll(Colors.orange),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -62,14 +64,12 @@ Future<bool> showExitPopup(context) async {
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: ElevatedButton(
-                      onPressed: () => {
-                        SystemNavigator.pop()
-                        // Navigator.of(context).pop(true),
-                      },
+                      onPressed: () => {SystemNavigator.pop()},
                       style: ButtonStyle(
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.white),
-                        backgroundColor:const MaterialStatePropertyAll(Colors.orange),
+                        backgroundColor:
+                            const MaterialStatePropertyAll(Colors.orange),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
@@ -92,4 +92,96 @@ Future<bool> showExitPopup(context) async {
         ),
       ) ??
       false;
+}
+
+void showProfileBottomSheet(context, userName, profileImage, profileSheetData) {
+  showModalBottomSheet(
+    isDismissible: false,
+    useSafeArea: true,
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      //  double w = MediaQuery.of(context).size.width;
+      double h = MediaQuery.of(context).size.height;
+      return Container(
+        height: h * 0.50,
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      height: 5,
+                      width: 100,
+                      decoration: const ShapeDecoration(
+                          color: Colors.grey,
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)))),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                IconButton(
+                  icon: CircleAvatar(
+                      backgroundColor: const Color(0xFF005689),
+                      radius: 40,
+                      child: Image.network(profileImage)),
+                  iconSize: 80,
+                  onPressed: () {},
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "$userName",
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: profileSheetData.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Icon(profileSheetData[index]["icon"]),
+                        title: Text(profileSheetData[index]["title"]),
+                        onTap: profileSheetData[index]["onTap"],
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                  icon: const Icon(
+                    Icons.cancel_outlined,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

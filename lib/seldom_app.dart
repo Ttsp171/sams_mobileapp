@@ -16,7 +16,6 @@ import 'screens/maintenance/offline.dart';
 import 'screens/onboarding/login.dart';
 import 'screens/onboarding/splash.dart';
 import 'services/api.dart';
-import 'widgets/toast.dart';
 
 SharedPreferanceKeyString prefKey = SharedPreferanceKeyString();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -147,7 +146,14 @@ class _SeldomAppState extends State<SeldomApp> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var isRemem = prefs.getBool(prefKey.isRemember) ?? false;
     if (isRemem) {
-      loginUser(context);
+      setState(() {
+        isDashBoard = true;
+      });
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          isSplash = false;
+        });
+      });
     } else {
       prefs.clear();
       Future.delayed(const Duration(seconds: 2), () {
@@ -158,47 +164,55 @@ class _SeldomAppState extends State<SeldomApp> {
     }
   }
 
-  loginUser(context) async {
-    print("**********RE LOGIN CALL************");
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var email = prefs.getString(prefKey.u1);
-    var password = prefs.getString(prefKey.u2);
-    final res = await HttpServices().authBoardPost(
-        '/api/user-login', {'email': email, 'password': password});
-    if (res["status"] == 200) {
-      await prefs.setString(prefKey.token, res["data"]["data"]["token"] ?? "");
-      getUserDetails(context);
-    } else {
-        Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          isSplash = false;
-        });
-      });
-      showToast(res["data"]["message"]);
-    }
-  }
+  // loginUser(context) async {
+  //   print("**********RE LOGIN CALL************");
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   var email = prefs.getString(prefKey.u1);
+  //   var password = prefs.getString(prefKey.u2);
+  //   final res = await HttpServices().authBoardPost(
+  //       '/api/user-login', {'email': email, 'password': password});
+  //   if (res["status"] == 200) {
+  //     await prefs.setString(prefKey.token, res["data"]["data"]["token"] ?? "");
+  //     // getUserDetails(context);
+  //     setState(() {
+  //       isDashBoard = true;
+  //     });
+  //     Future.delayed(const Duration(seconds: 2), () {
+  //       setState(() {
+  //         isSplash = false;
+  //       });
+  //     });
+  //   } else {
+  //     Future.delayed(const Duration(seconds: 2), () {
+  //       setState(() {
+  //         isSplash = false;
+  //       });
+  //     });
+  //     showToast(res["data"]["message"]);
+  //   }
+  // }
 
-  getUserDetails(context) async {
-    final res = await HttpServices().getWithToken('/api/user-details', context);
-    if (res["status"] == 200) {
-      setState(() {
-        userDetails = res["data"]["data"];
-        isDashBoard = true;
-      });
-        Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          isSplash = false;
-        });
-      });
-    } else {
-        Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          isSplash = false;
-        });
-      });
-      showToast(res["data"]["message"]);
-    }
-  }
+  // getUserDetails(context) async {
+  //   final res = await HttpServices().getWithToken('/api/user-details', context);
+  //   if (res["status"] == 200) {
+  //     setState(() {
+  //       userDetails = res["data"]["data"];
+  //       isDashBoard = true;
+  //     });
+  //     Future.delayed(const Duration(seconds: 2), () {
+  //       setState(() {
+  //         isSplash = false;
+  //       });
+  //     });
+  //   } else {
+  //     Future.delayed(const Duration(seconds: 2), () {
+  //       setState(() {
+  //         isSplash = false;
+  //       });
+  //     });
+  //     showToast(res["data"]["message"]);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +228,7 @@ class _SeldomAppState extends State<SeldomApp> {
                   : appForceUpdate
                       ? const ForceUpdate()
                       : isDashBoard
-                          ? DashBoardMain(userData: userDetails)
+                          ? const DashBoardMain()
                           : const LoginPage(),
     );
   }
