@@ -105,9 +105,9 @@ class _SeldomAppState extends State<SeldomApp> {
 
   List<String> getDeviceType() {
     if (Platform.isAndroid) {
-      return ["android", "1.0.0"];
+      return ["android", "1.1.0"];
     } else if (Platform.isIOS) {
-      return ["ios", "1.0.0"];
+      return ["ios", "1.1.0"];
     } else {
       return ["", ""];
     }
