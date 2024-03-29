@@ -105,9 +105,9 @@ class _SeldomAppState extends State<SeldomApp> {
 
   List<String> getDeviceType() {
     if (Platform.isAndroid) {
-      return ["android", "1.1.0"];
+      return ["android", "1.3.0"];
     } else if (Platform.isIOS) {
-      return ["ios", "1.1.0"];
+      return ["ios", "1.3.0"];
     } else {
       return ["", ""];
     }
@@ -163,56 +163,6 @@ class _SeldomAppState extends State<SeldomApp> {
       });
     }
   }
-
-  // loginUser(context) async {
-  //   print("**********RE LOGIN CALL************");
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   var email = prefs.getString(prefKey.u1);
-  //   var password = prefs.getString(prefKey.u2);
-  //   final res = await HttpServices().authBoardPost(
-  //       '/api/user-login', {'email': email, 'password': password});
-  //   if (res["status"] == 200) {
-  //     await prefs.setString(prefKey.token, res["data"]["data"]["token"] ?? "");
-  //     // getUserDetails(context);
-  //     setState(() {
-  //       isDashBoard = true;
-  //     });
-  //     Future.delayed(const Duration(seconds: 2), () {
-  //       setState(() {
-  //         isSplash = false;
-  //       });
-  //     });
-  //   } else {
-  //     Future.delayed(const Duration(seconds: 2), () {
-  //       setState(() {
-  //         isSplash = false;
-  //       });
-  //     });
-  //     showToast(res["data"]["message"]);
-  //   }
-  // }
-
-  // getUserDetails(context) async {
-  //   final res = await HttpServices().getWithToken('/api/user-details', context);
-  //   if (res["status"] == 200) {
-  //     setState(() {
-  //       userDetails = res["data"]["data"];
-  //       isDashBoard = true;
-  //     });
-  //     Future.delayed(const Duration(seconds: 2), () {
-  //       setState(() {
-  //         isSplash = false;
-  //       });
-  //     });
-  //   } else {
-  //     Future.delayed(const Duration(seconds: 2), () {
-  //       setState(() {
-  //         isSplash = false;
-  //       });
-  //     });
-  //     showToast(res["data"]["message"]);
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {

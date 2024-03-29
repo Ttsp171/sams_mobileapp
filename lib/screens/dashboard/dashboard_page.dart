@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:sams/screens/dashboard/drawer.dart';
 import 'package:sams/utils/colors.dart';
 import 'package:sams/widgets/common_widget.dart';
 
@@ -32,7 +30,6 @@ class _DashBoardMainState extends State<DashBoardMain> {
 
   getAllData() async {
     await getUserDetails(context);
-    print(dashBoardData);
     setState(() {
       dashBoardMain.addAll([
         {
@@ -162,21 +159,6 @@ class _DashBoardMainState extends State<DashBoardMain> {
                                         userDetails["name"],
                                         userDetails["profile_picture"], [
                                       {
-                                        "icon": const IconData(0xe491,
-                                            fontFamily: 'MaterialIcons'),
-                                        "title": "Update Profile",
-                                        "onTap": () {
-                                          print("object");
-                                        }
-                                      },
-                                      {
-                                        "icon": Icons.verified_user_outlined,
-                                        "title": "User Directory",
-                                        "onTap": () {
-                                          print("object");
-                                        }
-                                      },
-                                      {
                                         "icon": Icons.logout_outlined,
                                         "title": "Logout",
                                         "onTap": () {
@@ -197,13 +179,6 @@ class _DashBoardMainState extends State<DashBoardMain> {
                                     ]);
                                   },
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.menu),
-                                  iconSize: 30,
-                                  onPressed: () {
-                                    _scaffoldKey.currentState!.openEndDrawer();
-                                  },
-                                ),
                               ],
                             ),
                           ],
@@ -214,7 +189,6 @@ class _DashBoardMainState extends State<DashBoardMain> {
                       child: SizedBox(
                         height: h * 0.84,
                         child: ListView.builder(
-                          // scrollDirection: Axis.vertical,
                           itemCount: dashBoardMain.length,
                           itemBuilder: (context, index) {
                             return DashboardWidgetContainer(
@@ -231,10 +205,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                     ),
                   ],
                 ),
-                endDrawer: EndDrawerCustom(
-                  imageData: userDetails["profile_picture"],
-                  userName: userDetails["name"], context: context,
-                )),
+              ),
       ),
     );
   }
