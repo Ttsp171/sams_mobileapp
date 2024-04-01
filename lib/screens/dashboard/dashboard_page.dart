@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sams/screens/dashboard/drawer.dart';
 import 'package:sams/utils/colors.dart';
@@ -100,142 +101,354 @@ class _DashBoardMainState extends State<DashBoardMain> {
     }
   }
 
+  String emptyBedCount() {
+    var bedCount = dashBoardData["total_beds"] - dashBoardData["empty_beds"];
+    return bedCount.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     return WillPopScope(
-      onWillPop: () => showExitPopup(context),
-      child: SafeArea(
-        child: _show
-            ? Scaffold(
-                backgroundColor: Colors.white60,
-                body: SizedBox(
-                  width: w,
-                  height: h,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        color: ColorTheme.primaryColor,
-                      )
-                    ],
+        onWillPop: () => showExitPopup(context),
+        child: SafeArea(
+          child: _show
+              ? Scaffold(
+                  backgroundColor: Colors.white60,
+                  body: SizedBox(
+                    width: w,
+                    height: h,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: ColorTheme.primaryColor,
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              )
-            : Scaffold(
-                key: _scaffoldKey,
-                body: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 10, top: 15, bottom: 15, right: 5),
-                        child: Row(
+                )
+              : Scaffold(
+                  backgroundColor: Colors.orange.shade50,
+                  key: _scaffoldKey,
+                  body: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: w * 0.05, vertical: h * 0.05),
+                    child: Column(
+                      children: [
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Image.asset(
-                                  'assets/png/login_logo.png',
-                                  width: w * 0.40,
-                                  height: h * 0.08,
-                                  fit: BoxFit.fill,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  icon: CircleAvatar(
-                                      backgroundColor: const Color(0xFF005689),
-                                      radius: 20,
-                                      child: Image.network(
-                                          userDetails["profile_picture"])),
-                                  iconSize: 35,
-                                  onPressed: () {
-                                    showProfileBottomSheet(
-                                        context,
-                                        userDetails["name"],
-                                        userDetails["profile_picture"], [
-                                      {
-                                        "icon": const IconData(0xe491,
-                                            fontFamily: 'MaterialIcons'),
-                                        "title": "Update Profile",
-                                        "onTap": () {
-                                          print("object");
-                                        }
-                                      },
-                                      {
-                                        "icon": Icons.verified_user_outlined,
-                                        "title": "User Directory",
-                                        "onTap": () {
-                                          print("object");
-                                        }
-                                      },
-                                      {
-                                        "icon": Icons.logout_outlined,
-                                        "title": "Logout",
-                                        "onTap": () {
-                                          showAlertBox(
-                                              'Confirm Logout',
-                                              'Are you sure you want to Logout?',
-                                              'Logout',
-                                              () {
-                                                logoutCall(context);
-                                              },
-                                              'Cancel',
-                                              () {
-                                                Navigator.pop(context);
-                                              },
-                                              context);
-                                        }
-                                      },
-                                    ]);
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.menu),
-                                  iconSize: 30,
-                                  onPressed: () {
-                                    _scaffoldKey.currentState!.openEndDrawer();
-                                  },
-                                ),
-                              ],
+                            // CircleAvatar(
+                            //   backgroundColor: const Color(0xFF005689),
+                            //   radius: 30,
+                            //   child: Image.network(
+                            //     userDetails["profile_picture"],
+                            //   ),
+                            // ),
+                            Container(
+                                margin: const EdgeInsets.only(left: 20),
+                                width: w * 0.55,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Hello,   ${userDetails["name"]}!",
+                                      style: const TextStyle(
+                                          fontFamily: "Serif", fontSize: 24),
+                                    ),
+                                    const Text(
+                                      "Have a nice day",
+                                      style: TextStyle(
+                                          fontFamily: "Poppin", fontSize: 16),
+                                    ),
+                                  ],
+                                )),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.menu,
+                                color: Colors.black,
+                              ),
+                              iconSize: 40,
+                              onPressed: () {
+                                _scaffoldKey.currentState!.openEndDrawer();
+                              },
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: SizedBox(
-                        height: h * 0.84,
-                        child: ListView.builder(
-                          // scrollDirection: Axis.vertical,
-                          itemCount: dashBoardMain.length,
-                          itemBuilder: (context, index) {
-                            return DashboardWidgetContainer(
-                                widgetName: dashBoardMain[index]["name"],
-                                icon: dashBoardMain[index]["icon"],
-                                color1: dashBoardMain[index]["color1"],
-                                color2: dashBoardMain[index]["color2"],
-                                color3: dashBoardMain[index]["color3"],
-                                onClick: dashBoardMain[index]["onClick"],
-                                count: dashBoardMain[index]["count"]);
-                          },
+                        Padding(
+                          padding: EdgeInsets.only(top: h * 0.03),
+                          child: DashBoardIconCustom(
+                            customWidth: 0.9,
+                            customHeight: 0.2,
+                            containerColor: Colors.orange.shade300,
+                            child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                               dashboardHeadLabelCount("Available Buildings", dashBoardData["total_building"].toString()),
+                               dashboardHeadLabelCount("No of Rooms", dashBoardData["total_rooms"].toString()),
+                               dashboardHeadLabelCount("Total Capacity", dashBoardData["total_beds"].toString()),
+                              ],
+                            ),
+                          ),
                         ),
+                        ChildWidgetWithSub(
+                          subHeading: "Occupied",
+                          child1Label: "Rooms",
+                          child2Label: "Beds",
+                          child1Count:
+                              dashBoardData["occupaid_room"].toString(),
+                          child2Count: emptyBedCount(),
+                          label1Color: Colors.green.shade100,
+                          label2Color: Colors.green.shade100,
+                        ),
+                        ChildWidgetWithSub(
+                          subHeading: "Empty",
+                          child1Label: "Rooms",
+                          child2Label: "Beds",
+                          child1Count: dashBoardData["empty_room"].toString(),
+                          child2Count: dashBoardData["empty_beds"].toString(),
+                          label1Color: Colors.blue.shade100,
+                          label2Color: Colors.blue.shade100,
+                        ),
+                        DashBoardIconCustom(
+                          customWidth: 0.9,
+                          customHeight: 0.1,
+                          containerColor: Colors.grey.shade400,
+                          child: Column(
+                            children: [
+                              const Text(
+                                " Hold Beds",
+                                style: TextStyle(
+                                    fontFamily: "Poppin", fontSize: 22),
+                              ),
+                              Text(
+                                dashBoardData["hold_beds"].toString(),
+                                style: const TextStyle(
+                                    fontFamily: "Poppin", fontSize: 22),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  endDrawer: EndDrawerCustom(
+                    imageData: userDetails["profile_picture"],
+                    userName: userDetails["name"],
+                    context: context,
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerDocked,
+                  floatingActionButton: MediaQuery(
+                    data: MediaQuery.of(context)
+                        .copyWith(textScaler: const TextScaler.linear(1.0)),
+                    child: Container(
+                      width: w * 0.6,
+                      height: h * 0.06,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black54.withOpacity(0.1),
+                            blurRadius: 30,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.home,
+                                color: Colors.black,
+                              ),
+                              Text('Home')
+                            ],
+                          ),
+                          InkWell(
+                            onTap: () {
+                              showProfileBottomSheet(
+                                  context,
+                                  userDetails["name"],
+                                  userDetails["profile_picture"], [
+                                {
+                                  "icon": const IconData(0xe491,
+                                      fontFamily: 'MaterialIcons'),
+                                  "title": "Update Profile",
+                                  "onTap": () {
+                                    print("object");
+                                  }
+                                },
+                                {
+                                  "icon": Icons.verified_user_outlined,
+                                  "title": "User Directory",
+                                  "onTap": () {
+                                    print("object");
+                                  }
+                                },
+                                {
+                                  "icon": Icons.logout_outlined,
+                                  "title": "Logout",
+                                  "onTap": () {
+                                    showAlertBox(
+                                        'Confirm Logout',
+                                        'Are you sure you want to Logout?',
+                                        'Logout',
+                                        () {
+                                          logoutCall(context);
+                                        },
+                                        'Cancel',
+                                        () {
+                                          Navigator.pop(context);
+                                        },
+                                        context);
+                                  }
+                                },
+                              ]);
+                            },
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  color: Colors.grey,
+                                ),
+                                Text(
+                                  'Profile',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                  ],
-                ),
-                endDrawer: EndDrawerCustom(
-                  imageData: userDetails["profile_picture"],
-                  userName: userDetails["name"], context: context,
-                )),
-      ),
-    );
+                  )
+                  //  Scaffold(
+                  //     key: _scaffoldKey,
+                  //     body: Column(
+                  //       children: [
+                  //         Align(
+                  //           alignment: Alignment.topLeft,
+                  //           child: Padding(
+                  //             padding: const EdgeInsets.only(
+                  //                 left: 10, top: 15, bottom: 15, right: 5),
+                  //             child: Row(
+                  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //               children: [
+                  //                 Text("Hello, ${userDetails["name"]}"),
+                  //                 // Row(
+                  //                 //   children: [
+                  //                 //     Image.asset(
+                  //                 //       'assets/png/login_logo.png',
+                  //                 //       width: w * 0.40,
+                  //                 //       height: h * 0.08,
+                  //                 //       fit: BoxFit.fill,
+                  //                 //     ),
+                  //                 //   ],
+                  //                 // ),
+                  //                 Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.end,
+                  //                   children: [
+                  //                     IconButton(
+                  //                       icon: CircleAvatar(
+                  //                           backgroundColor: const Color(0xFF005689),
+                  //                           radius: 20,
+                  //                           child: Image.network(
+                  //                               userDetails["profile_picture"])),
+                  //                       iconSize: 35,
+                  //                       onPressed: () {
+                  //                         showProfileBottomSheet(
+                  //                             context,
+                  //                             userDetails["name"],
+                  //                             userDetails["profile_picture"], [
+                  //                           {
+                  //                             "icon": const IconData(0xe491,
+                  //                                 fontFamily: 'MaterialIcons'),
+                  //                             "title": "Update Profile",
+                  //                             "onTap": () {
+                  //                               print("object");
+                  //                             }
+                  //                           },
+                  //                           {
+                  //                             "icon": Icons.verified_user_outlined,
+                  //                             "title": "User Directory",
+                  //                             "onTap": () {
+                  //                               print("object");
+                  //                             }
+                  //                           },
+                  //                           {
+                  //                             "icon": Icons.logout_outlined,
+                  //                             "title": "Logout",
+                  //                             "onTap": () {
+                  //                               showAlertBox(
+                  //                                   'Confirm Logout',
+                  //                                   'Are you sure you want to Logout?',
+                  //                                   'Logout',
+                  //                                   () {
+                  //                                     logoutCall(context);
+                  //                                   },
+                  //                                   'Cancel',
+                  //                                   () {
+                  //                                     Navigator.pop(context);
+                  //                                   },
+                  //                                   context);
+                  //                             }
+                  //                           },
+                  //                         ]);
+                  //                       },
+                  //                     ),
+                  //                     // IconButton(
+                  //                     //   icon: const Icon(Icons.menu),
+                  //                     //   iconSize: 30,
+                  //                     //   onPressed: () {
+                  //                     //     _scaffoldKey.currentState!.openEndDrawer();
+                  //                     //   },
+                  //                     // ),
+                  //                   ],
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ),
+                  //         ),
+                  //     //     Expanded(
+                  //     //       child: SizedBox(
+                  //     //         height: h * 0.84,
+                  //     //         child: ListView.builder(
+                  //     //           // scrollDirection: Axis.vertical,
+                  //     //           itemCount: dashBoardMain.length,
+                  //     //           itemBuilder: (context, index) {
+                  //     //             return DashboardWidgetContainer(
+                  //     //                 widgetName: dashBoardMain[index]["name"],
+                  //     //                 icon: dashBoardMain[index]["icon"],
+                  //     //                 color1: dashBoardMain[index]["color1"],
+                  //     //                 color2: dashBoardMain[index]["color2"],
+                  //     //                 color3: dashBoardMain[index]["color3"],
+                  //     //                 onClick: dashBoardMain[index]["onClick"],
+                  //     //                 count: dashBoardMain[index]["count"]);
+                  //     //           },
+                  //     //         ),
+                  //     //       ),
+                  //     //     ),
+                  //       ],
+                  //     ),
+
+                  //     endDrawer: EndDrawerCustom(
+                  //       imageData: userDetails["profile_picture"],
+                  //       userName: userDetails["name"], context: context,
+                  //     )),
+                  ),
+        ));
   }
 }

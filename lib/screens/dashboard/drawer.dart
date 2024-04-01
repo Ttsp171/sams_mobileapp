@@ -236,42 +236,46 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
 
   @override
   Widget build(BuildContext context) {
-    // double w = MediaQuery.of(context).size.width;
+    double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     return Drawer(
-      child: Column(
-        children: [
-          SizedBox(
-            height: h * 0.1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                IconButton(
-                  icon: CircleAvatar(
-                    backgroundColor: const Color(0xFF005689),
-                    radius: 20,
-                    child: Image.network(widget.imageData),
-                  ),
-                  iconSize: 35,
-                  onPressed: () {},
-                ),
-                Text(widget.userName),
-                const Icon(
-                  Icons.verified_rounded,
-                  color: Colors.green,
-                )
-              ],
+      child: Padding(
+        padding:  EdgeInsets.symmetric(horizontal: w*0.05,vertical: h*0.05),
+        child: Column(
+          children: [
+            // SizedBox(
+            //   height: h * 0.1,
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.start,
+            //     children: [
+            //       IconButton(
+            //         icon: CircleAvatar(
+            //           backgroundColor: const Color(0xFF005689),
+            //           radius: 20,
+            //           child: Image.network(widget.imageData),
+            //         ),
+            //         iconSize: 35,
+            //         onPressed: () {},
+            //       ),
+            //       Text(widget.userName),
+            //       const Icon(
+            //         Icons.verified_rounded,
+            //         color: Colors.green,
+            //       )
+            //     ],
+            //   ),
+            // ),
+           
+            Expanded(
+              child: ListView.builder(
+                itemCount: drawerItems.length,
+                itemBuilder: (context, index) {
+                  return _buildItem(drawerItems[index]);
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: drawerItems.length,
-              itemBuilder: (context, index) {
-                return _buildItem(drawerItems[index]);
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
