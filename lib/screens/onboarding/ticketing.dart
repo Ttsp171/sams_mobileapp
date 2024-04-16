@@ -295,11 +295,13 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
   storeFMTickets(context) async {
     final updateRes =
         await HttpServices().postWithAttachments('/api/update-user', {
-      'user_id': userId,
+      'user_id': userId.toString(),
       'company_id': companyId.toString(),
       'contact_number': contactNo.toString()
     }, []);
     print(updateRes);
+    print(
+        "  employee_name: $employeeName contact_no: $contactNo building_id: $buildingId room_id': $roomId subject': subject city_id': $cityId message': $message company_id': $companyId");
     final res = await HttpServices().postWithAttachments(
         '/api/store-fm-ticket',
         {
@@ -310,7 +312,8 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
           'subject': subject,
           'city_id': cityId.toString(),
           'message': message.toString(),
-          'company_id': companyId.toString()
+          'company_id': companyId.toString(),
+           'user_id': userId.toString()
         },
         attachment.isEmpty ? [] : attachment[0]);
     if (res["status"] == 200) {
@@ -328,8 +331,7 @@ class _RegisterTicketingState extends State<RegisterTicketing> {
     }
   }
 
-   getCompanyName(id) {
-  
+  getCompanyName(id) {
     for (var company in companyDropDown) {
       if (company["Company_ID"] == id) {
         setState(() {

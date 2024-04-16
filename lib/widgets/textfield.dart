@@ -146,3 +146,56 @@ class CustomTextFieldWithLabel extends StatelessWidget {
     );
   }
 }
+
+class SearchFieldWithIcon extends StatefulWidget {
+  final String hintText;
+  final TextEditingController controller;
+  final ValueChanged onCompleted;
+  final double? width;
+  final VoidCallback? onTap;
+  final ValueChanged? onChanged;
+  const SearchFieldWithIcon(
+      {super.key,
+      required this.hintText,
+      required this.controller,
+      required this.onCompleted,
+      this.onTap,
+      this.width,
+      this.onChanged});
+
+  @override
+  State<SearchFieldWithIcon> createState() => _SearchFieldWithIconState();
+}
+
+class _SearchFieldWithIconState extends State<SearchFieldWithIcon> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.width ?? 220,
+      height: MediaQuery.of(context).size.height * 0.05,
+      child: TextField(
+        controller: widget.controller,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          suffixIcon: IconButton(
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                widget.onCompleted(widget.controller.text);
+              },
+              icon: const Icon(Icons.search)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        ),
+        onChanged: widget.onChanged,
+        onTap: widget.onTap,
+        onSubmitted: widget.onCompleted,
+        onTapOutside: (event) {
+          FocusScope.of(context).unfocus();
+        },
+      ),
+    );
+  }
+}

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import '../utils/colors.dart';
 
 class DashboardWidgetContainer extends StatelessWidget {
   final String widgetName;

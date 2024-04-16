@@ -131,11 +131,11 @@ class _DashBoardMainState extends State<DashBoardMain> {
                   ),
                 )
               : Scaffold(
-                  backgroundColor: Colors.orange.shade50,
+                  backgroundColor: const Color.fromRGBO(240, 240, 189, 1),
                   key: _scaffoldKey,
                   body: Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: w * 0.05, vertical: h * 0.05),
+                        horizontal: w * 0.04, vertical: h * 0.05),
                     child: Column(
                       children: [
                         Row(
@@ -183,7 +183,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                           child: DashBoardIconCustom(
                             customWidth: 0.9,
                             customHeight: 0.2,
-                            containerColor: Colors.orange.shade300,
+                            containerColor: const Color.fromRGBO(242, 125, 90, 0.5),
                             child: Column(
                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -201,8 +201,8 @@ class _DashBoardMainState extends State<DashBoardMain> {
                           child1Count:
                               dashBoardData["occupaid_room"].toString(),
                           child2Count: emptyBedCount(),
-                          label1Color: Colors.green.shade100,
-                          label2Color: Colors.green.shade100,
+                          label1Color:  Color.fromRGBO(210, 255, 31, 1),
+                          label2Color:Color.fromRGBO(210, 255, 31, 1),
                         ),
                         ChildWidgetWithSub(
                           subHeading: "Empty",
@@ -210,13 +210,13 @@ class _DashBoardMainState extends State<DashBoardMain> {
                           child2Label: "Beds",
                           child1Count: dashBoardData["empty_room"].toString(),
                           child2Count: dashBoardData["empty_beds"].toString(),
-                          label1Color: Colors.blue.shade100,
-                          label2Color: Colors.blue.shade100,
+                          label1Color:const Color.fromRGBO(247, 146, 146, 1),
+                          label2Color:const Color.fromRGBO(247, 146, 146, 1),
                         ),
                         DashBoardIconCustom(
                           customWidth: 0.9,
                           customHeight: 0.1,
-                          containerColor: Colors.grey.shade400,
+                          containerColor:  const Color.fromRGBO(206, 188, 255, 1),
                           child: Column(
                             children: [
                               const Text(
@@ -264,14 +264,14 @@ class _DashBoardMainState extends State<DashBoardMain> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const Column(
+                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.home,
-                                color: Colors.black,
+                                color: Colors.blue.shade600,
                               ),
-                              Text('Home')
+                              const Text('Home')
                             ],
                           ),
                           InkWell(

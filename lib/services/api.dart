@@ -28,7 +28,8 @@ class HttpServices {
       };
     }
   }
-    Future postWithToken(endpoint, context) async {
+
+  Future postWithToken(endpoint, context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       final response = await http
@@ -46,7 +47,6 @@ class HttpServices {
     }
   }
 
-
   Future get(String url, BuildContext? context) async {
     try {
       final response =
@@ -59,6 +59,24 @@ class HttpServices {
       return {"status": response.statusCode, "data": data};
     } catch (e) {
       showToast("Internal Server Error");
+    }
+  }
+
+  Future post(endpoint, context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    try {
+      final response = await http
+          .post(Uri.parse('$baseUrl$endpoint'), headers: <String, String>{
+        'Accept-Language': 'EN-US',
+        'Authorization': 'Bearer ${prefs.getString(prefKey.token)}'
+      });
+      var data = json.decode(response.body);
+      return {"status": response.statusCode, "data": data};
+    } catch (e) {
+      return {
+        "status": 700,
+        "data": {"message": "Internal Server Error"}
+      };
     }
   }
 

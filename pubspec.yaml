@@ -9,13 +9,14 @@ environment:
   sdk: ">=3.2.6 <4.0.0"
 
 dependencies:
-  connectivity_plus: ^6.0.1
+  connectivity_plus: ^6.0.2
   cupertino_icons: ^1.0.2
   file_picker: ^6.2.0
   firebase_auth: ^4.17.8
   firebase_core: ^2.27.0
   flutter:
     sdk: flutter
+  flutter_speed_dial: ^7.0.0
   flutter_svg: ^2.0.10+1
   fluttertoast: ^8.2.4
   get: ^4.6.6
@@ -26,6 +27,7 @@ dependencies:
   open_store: ^0.5.0
   page_transition: ^2.1.0
   shared_preferences: ^2.2.2
+  shimmer: ^3.0.0
   webview_flutter: ^4.7.0
 
 dev_dependencies:

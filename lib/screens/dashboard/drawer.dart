@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
 import 'package:sams/screens/view_Pages/tickets/fm_tickets/fmticket_view.dart';
 
+import '../view_Pages/tickets/medical_tickets/medical_ticket.dart';
+
 class EndDrawerCustom extends StatefulWidget {
   final String imageData;
   final BuildContext context;
@@ -139,7 +141,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Medical Tickets",
             "icon": Icons.airplane_ticket,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(widget.context, const MedicalTicketView());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
@@ -240,7 +244,7 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
     double h = MediaQuery.of(context).size.height;
     return Drawer(
       child: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: w*0.05,vertical: h*0.05),
+        padding: EdgeInsets.symmetric(horizontal: w * 0.05, vertical: h * 0.05),
         child: Column(
           children: [
             // SizedBox(
@@ -265,7 +269,7 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
             //     ],
             //   ),
             // ),
-           
+
             Expanded(
               child: ListView.builder(
                 itemCount: drawerItems.length,
@@ -293,7 +297,7 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
       return ListTile(
         title: Text(item["itemName"]),
         leading: Icon(item["icon"]),
-          onTap: item["onTap"],
+        onTap: item["onTap"],
       );
     }
   }
