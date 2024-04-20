@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
+import 'package:sams/screens/view_Pages/tickets/application_users/applicants.dart';
 import 'package:sams/screens/view_Pages/tickets/fm_tickets/fmticket_view.dart';
 
 import '../view_Pages/tickets/medical_tickets/medical_ticket.dart';
@@ -150,7 +151,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Application Users",
             "icon": Icons.airplane_ticket,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(widget.context, const ApplicantsView());
+            },
             "isSubExpand": false,
             "expandItems": []
           },

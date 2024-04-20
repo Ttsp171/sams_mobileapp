@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:sams/controllers/datetime_controller.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/screens/onboarding/ticketing.dart';
-import 'package:sams/utils/colors.dart';
+import 'package:sams/screens/view_Pages/tickets/edit_tickets.dart';
 import 'package:sams/widgets/card.dart';
 
 import '../../../../services/api.dart';
+import '../../../../utils/colors.dart';
 import '../../../../widgets/shimmer.dart';
 import '../../../../widgets/textfield.dart';
 import '../../../../widgets/toast.dart';
+import '../add_tickets.dart';
 
 class FMTicketView extends StatefulWidget {
   const FMTicketView({super.key});
@@ -21,7 +21,7 @@ class FMTicketView extends StatefulWidget {
 class _FMTicketViewState extends State<FMTicketView> {
   List normalTickets = [], searchNormalTickets = [];
   int currentPage = 1;
-  bool isLoading = false, isFirstTime = true, _show = true;
+  bool isLoading = false, isFirstTime = true, _show = true, isNextPage = false;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -35,15 +35,18 @@ class _FMTicketViewState extends State<FMTicketView> {
     setState(() {
       isLoading = true;
     });
-    final res =
-        await HttpServices().getWithToken('/api/get-tickets?type=1', context);
+    final res = await HttpServices().getWithToken(
+        '/api/get-tickets?type=1&per_page=10&page=$currentPage', context);
     if (res["status"] == 200) {
       setState(() {
-        normalTickets.addAll(res["data"]["data"]);
+        normalTickets.addAll(res["data"]["original"]["data"]["data"]);
         currentPage++;
         isLoading = false;
         _show = false;
         isFirstTime = false;
+        isNextPage = res["data"]["original"]["data"]["next_page_url"] == null
+            ? false
+            : true;
       });
     } else {
       setState(() {
@@ -95,11 +98,29 @@ class _FMTicketViewState extends State<FMTicketView> {
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollEndNotification &&
-        notification.metrics.pixels >= notification.metrics.maxScrollExtent) {
-      // getNormalTicketsData();
+        notification.metrics.pixels >= notification.metrics.maxScrollExtent &&
+        isNextPage) {
+      getNormalTicketsData();
       return true;
     }
     return false;
+  }
+
+  deleteTicket(ticketId, index) async {
+    setState(() {
+      _show = true;
+    });
+    final res = await HttpServices().postWIthTokenAndBody(
+        '/api/delete-ticket', {'ticket_id': ticketId.toString()});
+    if (res["status"] == 200) {
+      setState(() {
+        normalTickets.removeAt(index);
+        _show = false;
+      });
+      showSuccessToast(res["data"]["message"]);
+    } else {
+      showToast("Something went wrong");
+    }
   }
 
   @override
@@ -117,6 +138,19 @@ class _FMTicketViewState extends State<FMTicketView> {
             Navigator.of(context).pop();
           },
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.save,
+                  size: 40,
+                  color: Colors.black,
+                  weight: BorderSide.strokeAlignOutside,
+                )),
+          )
+        ],
         backgroundColor: ColorTheme.primaryColor,
       ),
       body: Stack(
@@ -199,6 +233,24 @@ class _FMTicketViewState extends State<FMTicketView> {
                                             "",
                                       },
                                       isBottomButton: true,
+                                      bottomClickData: {
+                                        "onLeftLabel": "Edit",
+                                        "onRightLabel": "Delete",
+                                        "onLeftClick": () {
+                                          navigateWithRoute(
+                                              context,
+                                              EditTickets(
+                                                  ticketData:
+                                                      searchNormalTickets[
+                                                          index]));
+                                        },
+                                        "onRightClick": () {
+                                          deleteTicket(
+                                              searchNormalTickets[index]
+                                                  ["employee_name"]["id"],
+                                              index);
+                                        }
+                                      },
                                     );
                                   },
                                 ),
@@ -214,52 +266,81 @@ class _FMTicketViewState extends State<FMTicketView> {
                                           style: TextStyle(fontSize: 20),
                                         )),
                                   )
-                                : Expanded(
-                                    child: ListView.builder(
-                                      itemCount: normalTickets.length,
-                                      itemBuilder: (context, index) {
-                                        return CardContainer(
-                                          height: 260,
-                                          datas: {
-                                            'S. No': index + 1,
-                                            'Name': normalTickets[index]
-                                                    ["employee_name"] ??
-                                                "",
-                                            'Created Date':
-                                                formatDateToDDMMYYYYHHMMString(
-                                                    normalTickets[index]
-                                                            ["created_at"]
-                                                        .toString()),
-                                            'Building Number':
-                                                normalTickets[index]
-                                                        ["building_no"] ??
+                                : normalTickets.isEmpty
+                                    ? const Expanded(
+                                        child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              "No Tickets Found",
+                                              style: TextStyle(fontSize: 20),
+                                            )),
+                                      )
+                                    : Expanded(
+                                        child: ListView.builder(
+                                          itemCount: normalTickets.length,
+                                          itemBuilder: (context, index) {
+                                            return CardContainer(
+                                              height: 260,
+                                              datas: {
+                                                'S. No': index + 1,
+                                                'Name': normalTickets[index]
+                                                        ["employee_name"] ??
                                                     "",
-                                            'Room Number': normalTickets[index]
-                                                    ["room_number"] ??
-                                                "",
-                                            'Subject': normalTickets[index]
-                                                    ["subject"] ??
-                                                "",
-                                            'Message': normalTickets[index]
-                                                    ["message"] ??
-                                                "",
-                                            'Status': normalTickets[index]
-                                                    ["status"] ??
-                                                "",
-                                            'Completed Date':
-                                                formatDateToDDMMYYYYHHMMString(
+                                                'Created Date':
+                                                    formatDateToDDMMYYYYHHMMString(
+                                                        normalTickets[index]
+                                                                ["created_at"]
+                                                            .toString()),
+                                                'Building Number':
                                                     normalTickets[index]
-                                                            ["completed_date"]
-                                                        .toString()),
-                                            'Attachment': normalTickets[index]
-                                                    ["attechment"] ??
-                                                "",
+                                                            ["building_no"] ??
+                                                        "",
+                                                'Room Number':
+                                                    normalTickets[index]
+                                                            ["room_number"] ??
+                                                        "",
+                                                'Subject': normalTickets[index]
+                                                        ["subject"] ??
+                                                    "",
+                                                'Message': normalTickets[index]
+                                                        ["message"] ??
+                                                    "",
+                                                'Status': normalTickets[index]
+                                                        ["status"] ??
+                                                    "",
+                                                'Completed Date':
+                                                    formatDateToDDMMYYYYHHMMString(
+                                                        normalTickets[index][
+                                                                "completed_date"]
+                                                            .toString()),
+                                                'Attachment':
+                                                    normalTickets[index]
+                                                            ["attechment"] ??
+                                                        "",
+                                              },
+                                              isBottomButton: true,
+                                              bottomClickData: {
+                                                "onLeftLabel": "Edit",
+                                                "onRightLabel": "Delete",
+                                                "onLeftClick": () {
+                                                  navigateWithRoute(
+                                                      context,
+                                                      EditTickets(
+                                                          ticketData:
+                                                              normalTickets[
+                                                                  index]));
+                                                },
+                                                "onRightClick": () {
+                                                  deleteTicket(
+                                                      normalTickets[index]
+                                                          ["id"],
+                                                      index);
+                                                }
+                                              },
+                                            );
                                           },
-                                          isBottomButton: true,
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                        ),
+                                      ),
                         if (isLoading && !isFirstTime)
                           const CircularProgressIndicator(),
                       ],
@@ -268,33 +349,15 @@ class _FMTicketViewState extends State<FMTicketView> {
           ),
         ],
       ),
-      floatingActionButton: SpeedDial(
-        icon: Icons.add,
-        activeIcon: Icons.close,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          navigateWithRoute(context, const AddTickets());
+        },
         backgroundColor: ColorTheme.primaryColor,
-        foregroundColor: Colors.white,
-        visible: true,
-        closeManually: false,
-        curve: Curves.bounceIn,
-        overlayColor: Colors.black,
-        overlayOpacity: 0.5,
-        onOpen: () => debugPrint('OPENING DIAL'),
-        onClose: () => debugPrint('DIAL CLOSED'),
-        elevation: 8.0,
-        shape: const CircleBorder(),
-        children: [
-          // for (var buttonData in _buttons)
-          SpeedDialChild(
-            child: const Icon(Icons.new_label),
-            backgroundColor: ColorTheme.backgroundColor,
-            label: "Add New Ticket",
-            labelStyle: const TextStyle(fontSize: 15, color: Colors.black),
-            onTap: () {
-              navigateWithRoute(context, const RegisterTicketing(userData: {}));
-            },
-            onLongPress: () => debugPrint('FIRST CHILD LONG PRESS'),
-          ),
-        ],
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

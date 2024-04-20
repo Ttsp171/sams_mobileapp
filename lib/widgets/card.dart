@@ -152,11 +152,13 @@ class CardContainer extends StatefulWidget {
   final Map datas;
   final double height;
   final bool isBottomButton;
+  final Map bottomClickData;
   const CardContainer(
       {super.key,
       required this.datas,
       required this.isBottomButton,
-      required this.height});
+      required this.height,
+      required this.bottomClickData});
 
   @override
   State<CardContainer> createState() => _CardContainerState();
@@ -227,8 +229,10 @@ class _CardContainerState extends State<CardContainer> {
                               child: keys[index] == "Attachment" &&
                                       values[index] != ""
                                   ? customFlatButtomwithSize('View', () {
-                                      navigateWithRoute(context,
-                                          ImageViewCustom(imageUrl: values[index]));
+                                      navigateWithRoute(
+                                          context,
+                                          ImageViewCustom(
+                                              imageUrl: values[index]));
                                     }, h * 0.03, w * 0.30, Colors.white,
                                       Colors.white, Colors.blue.shade300, false)
                                   : Text(
@@ -259,13 +263,24 @@ class _CardContainerState extends State<CardContainer> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    customFlatButtomwithSize('Edit', () {}, h * 0.06, w * 0.30,
-                        Colors.white, Colors.white, Colors.orange, false),
-                    customFlatButtomwithSize('Delete', () {
-                      Navigator.pop(context);
-                      //  navigateWithRoute(context, const UserLoginPage());
-                    }, h * 0.06, w * 0.30, Colors.orange, Colors.orange,
-                        Colors.white, false),
+                    customFlatButtomwithSize(
+                        widget.bottomClickData["onLeftLabel"],
+                        widget.bottomClickData["onLeftClick"],
+                        h * 0.06,
+                        w * 0.30,
+                        Colors.white,
+                        Colors.white,
+                        Colors.orange,
+                        false),
+                    customFlatButtomwithSize(
+                        widget.bottomClickData["onRightLabel"],
+                        widget.bottomClickData["onRightClick"],
+                        h * 0.06,
+                        w * 0.30,
+                        Colors.orange,
+                        Colors.orange,
+                        Colors.white,
+                        false),
                   ],
                 ),
             ],

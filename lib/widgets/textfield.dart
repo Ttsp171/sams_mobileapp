@@ -11,7 +11,10 @@ class CustomLoginTextField extends StatefulWidget {
       {super.key,
       required this.hinText,
       required this.onChanged,
-      this.errorText, this.suffixIcon, this.suffixIconPressed, this.obscureText});
+      this.errorText,
+      this.suffixIcon,
+      this.suffixIconPressed,
+      this.obscureText});
 
   @override
   State<CustomLoginTextField> createState() => _CustomLoginTextFieldState();
@@ -26,12 +29,12 @@ class _CustomLoginTextFieldState extends State<CustomLoginTextField> {
       width: width * 0.85,
       height: height * 0.10,
       child: TextFormField(
-        
-          obscureText:widget.obscureText??false,
-      
+        obscureText: widget.obscureText ?? false,
         decoration: InputDecoration(
-        
-          suffixIcon: IconButton(icon: Icon(widget.suffixIcon),onPressed: widget.suffixIconPressed,),
+          suffixIcon: IconButton(
+            icon: Icon(widget.suffixIcon),
+            onPressed: widget.suffixIconPressed,
+          ),
           filled: true,
           fillColor: Colors.transparent,
           border: OutlineInputBorder(
@@ -64,6 +67,7 @@ class CustomTextFieldWithLabel extends StatelessWidget {
   final String hintText;
   final ValueChanged onChanged;
   final bool? readOnly;
+  final String? isErrorBottom;
   final int? maxLines;
   final String? initialValue;
   final int? maxLength;
@@ -78,7 +82,8 @@ class CustomTextFieldWithLabel extends StatelessWidget {
       this.readOnly,
       this.initialValue,
       this.errorText,
-      this.maxLength});
+      this.maxLength,
+      this.isErrorBottom});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +91,7 @@ class CustomTextFieldWithLabel extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     return SizedBox(
       width: width * 0.85,
-      height: height * 0.12,
+      height:errorText != null &&isErrorBottom != null?height * 0.14: height * 0.12,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -107,9 +112,10 @@ class CustomTextFieldWithLabel extends StatelessWidget {
                     color: Colors.red,
                   ),
                 ),
-              if (errorText != null)
+              if (errorText != null && isErrorBottom == null)
                 Text(
                   "   $errorText",
+                  maxLines: 5,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.red.shade600,
@@ -120,27 +126,47 @@ class CustomTextFieldWithLabel extends StatelessWidget {
           SizedBox(
             height: height * 0.01,
           ),
-          Container(
-            padding: const EdgeInsets.only(left: 15),
-            decoration: const BoxDecoration(color: Colors.white),
-            child: TextFormField(
-              style: const TextStyle(fontWeight: FontWeight.normal),
-              maxLength: maxLength,
-              readOnly: readOnly ?? false,
-              initialValue: initialValue ?? "",
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: hintText,
-                  hintStyle: const TextStyle(color: Colors.grey)),
-              onChanged: onChanged,
-              onTapOutside: (event) {
-                FocusScope.of(context).unfocus();
-              },
-            ),
-          ),
-          SizedBox(
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 15),
+                decoration: const BoxDecoration(color: Colors.white),
+                child: TextFormField(
+                  style: const TextStyle(fontWeight: FontWeight.normal),
+                  maxLength: maxLength,
+                  readOnly: readOnly ?? false,
+                  initialValue: initialValue ?? "",
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: hintText,
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  onChanged: onChanged,
+                  onTapOutside: (event) {
+                    FocusScope.of(context).unfocus();
+                  },
+                ),
+              ),
+               SizedBox(
             height: height * 0.01,
           ),
+              if (errorText != null && isErrorBottom != null)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    "$errorText",
+                    maxLines: 5,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red.shade600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+         
         ],
       ),
     );

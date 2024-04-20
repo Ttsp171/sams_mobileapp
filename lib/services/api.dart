@@ -122,4 +122,29 @@ class HttpServices {
       showToast('Error uploading file: $e');
     }
   }
+
+  Future postWIthTokenAndBody(endpoint, body) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl$endpoint'));
+    request.fields.addAll(body);
+    request.headers.addAll({
+      'Accept-Language': 'EN-US',
+      'Authorization': 'Bearer ${prefs.getString(prefKey.token)}'
+    });
+
+    try {
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        var dataNew = await response.stream.bytesToString();
+        return {
+          "status": response.statusCode,
+          "data": json.decode(dataNew)
+        };
+      } else {
+        return {"status": response.statusCode, "data": response.reasonPhrase};
+      }
+    } catch (e) {
+      showToast('Error : $e');
+    }
+  }
 }

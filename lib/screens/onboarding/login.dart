@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
 import 'package:sams/screens/dashboard/dashboard_page.dart';
 import 'package:sams/screens/maintenance/privacy_policy.dart';
+import 'package:sams/screens/onboarding/reset_password.dart';
 import 'package:sams/seldom_app.dart';
 import 'package:sams/widgets/bottomsheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -156,18 +157,20 @@ class _LoginPageState extends State<LoginPage> {
                             color: Color.fromRGBO(255, 167, 23, 1)),
                       )),
                   Container(
-                      alignment: Alignment.center,
-                      child: CustomLoginTextField(
-                          hinText: "Email",
-                          errorText: _emailError,
-                          onChanged: (val) {
-                            setState(() {
-                              email = val;
-                            });
-                            if (!_isFirstTime) {
-                              _validateEmail(val);
-                            }
-                          })),
+                    alignment: Alignment.center,
+                    child: CustomLoginTextField(
+                      hinText: "Email",
+                      errorText: _emailError,
+                      onChanged: (val) {
+                        setState(() {
+                          email = val;
+                        });
+                        if (!_isFirstTime) {
+                          _validateEmail(val);
+                        }
+                      },
+                    ),
+                  ),
                   Container(
                       alignment: Alignment.center,
                       child: CustomLoginTextField(
@@ -241,7 +244,9 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              navigateWithRoute(context, const ResetPassword());
+                            },
                             child: const Text(
                               "Forgot Password ?",
                               style: TextStyle(color: Colors.blue),
