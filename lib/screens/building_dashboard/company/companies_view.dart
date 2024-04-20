@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/utils/colors.dart';
-import 'package:sams/widgets/card.dart';
 
-import '../../../../services/api.dart';
-import '../../../../widgets/shimmer.dart';
-import '../../../../widgets/textfield.dart';
-import '../../../../widgets/toast.dart';
-import '../../../dashboard/dashboard_page.dart';
+import '../../../services/api.dart';
+import '../../../utils/colors.dart';
+import '../../../widgets/alert_dailog.dart';
+import '../../../widgets/card.dart';
+import '../../../widgets/shimmer.dart';
+import '../../../widgets/textfield.dart';
+import '../../../widgets/toast.dart';
 
-class ApplicantsView extends StatefulWidget {
-  const ApplicantsView({super.key});
+class CompaniesDetail extends StatefulWidget {
+  const CompaniesDetail({super.key});
 
   @override
-  State<ApplicantsView> createState() => _ApplicantsViewState();
+  State<CompaniesDetail> createState() => _CompaniesDetailState();
 }
 
-class _ApplicantsViewState extends State<ApplicantsView> {
-  List applicants = [], searchApplicants = [];
+class _CompaniesDetailState extends State<CompaniesDetail> {
+  List companies = [], searchCompanies = [];
+  String companyName = "";
   int currentPage = 1;
   bool isLoading = false, isFirstTime = true, _show = true, isNextPage = false;
   final TextEditingController _searchController = TextEditingController();
@@ -25,26 +25,23 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   @override
   void initState() {
     super.initState();
-    getApplicants();
+    getCompanies();
   }
 
-  getApplicants() async {
+  getCompanies() async {
     if (isLoading) return;
     setState(() {
       isLoading = true;
     });
-    final res = await HttpServices().getWithToken(
-        '/api/application-user-list?page=$currentPage&per_page=10', context);
+    final res = await HttpServices()
+        .postWIthTokenAndBody('/api/company', {'type': '1'});
     if (res["status"] == 200) {
       setState(() {
-        applicants.addAll(res["data"]["original"]["data"]["data"]);
+        companies.addAll(res["data"]["data"]);
         currentPage++;
         isLoading = false;
         _show = false;
         isFirstTime = false;
-        isNextPage = res["data"]["original"]["data"]["next_page_url"] == null
-            ? false
-            : true;
       });
     } else {
       setState(() {
@@ -55,17 +52,94 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     }
   }
 
+  deleteCompany(companyId, index) async {
+    setState(() {
+      _show = true;
+    });
+    final res = await HttpServices().postWIthTokenAndBody(
+        '/api/company', {'type': '5', 'company_id': companyId.toString()});
+    print(res);
+    if (res["status"] == 200) {
+      setState(() {
+        companies.removeAt(index);
+        _show = false;
+      });
+      showSuccessToast(res["data"]["message"]);
+    } else {
+      setState(() {
+        _show = false;
+      });
+      showToast("Something Went Wrong");
+    }
+  }
+
+  addCompany(context) async {
+    if (companyName == "") {
+      showSuccessToast("Please Enter Company Name");
+    } else {
+      setState(() {
+        _show = true;
+      });
+      final res = await HttpServices().postWIthTokenAndBody('/api/company',
+          {'type': '2', 'company_name': companyName.toString()});
+      if (res["status"] == 200) {
+        setState(() {
+          companies = [];
+          searchCompanies = [];
+          companyName = "";
+        });
+        getCompanies();
+        showSuccessToast(res["data"]["message"]);
+      } else {
+        setState(() {
+          _show = false;
+        });
+        showToast("Something went Wrong");
+      }
+    }
+  }
+
+  editCompany(companyId, context) async {
+    if (companyName == "") {
+      showSuccessToast("Please Enter City Name");
+    } else {
+      setState(() {
+        _show = true;
+      });
+      final res =
+          await HttpServices().postWIthTokenAndBody('/api/company', {
+        'type': '4',
+        'company_name': companyName.toString(),
+        'company_id': companyId.toString()
+      });
+      if (res["status"] == 200) {
+        setState(() {
+          companies = [];
+          searchCompanies = [];
+          companyName = "";
+        });
+        getCompanies();
+        showSuccessToast(res["data"]["message"]);
+      } else {
+        setState(() {
+          _show = false;
+        });
+        showToast("Something went Wrong");
+      }
+    }
+  }
+
   searchVacantProperty(keyword) async {
     // setState(() {
-    //   searchApplicants = [];
+    //   searchCompanies = [];
     // });
-    // for (var i in applicants) {
+    // for (var i in companies) {
     //   i.forEach((key, value) {
     //     if (value==keyword) {
     //       setState(() {
     //         _show = false;
     //       });
-    //       searchApplicants.addAll(i);
+    //       searchCompanies.addAll(i);
     //     } else {
     //       setState(() {
     //         _show = false;
@@ -84,7 +158,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   //   if (res["data"]["data"]["data"].isEmpty) {
   //   } else {
   //     setState(() {
-  //       searchApplicants.addAll(res["data"]["data"]["data"]);
+  //       searchCompanies.addAll(res["data"]["data"]["data"]);
   //     });
   //   }
   // } else {
@@ -98,49 +172,18 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     if (notification is ScrollEndNotification &&
         notification.metrics.pixels >= notification.metrics.maxScrollExtent &&
         isNextPage) {
-      getApplicants();
+      // getcompanies();
       return true;
     }
     return false;
-  }
-
-  deleteApplicant(applicantId, index) async {
-    setState(() {
-      _show = true;
-    });
-    final res = await HttpServices().postWIthTokenAndBody(
-        '/api/action-of-application-user',
-        {'app_user_id': applicantId.toString(), 'type': '3'});
-    if (res["status"] == 200) {
-      setState(() {
-        applicants.removeAt(index);
-        _show = false;
-      });
-      showSuccessToast(res["data"]["original"]["message"]);
-    } else {
-      showToast("Something went wrong");
-    }
-  }
-
-  updateApplicant(applicantId, type, context) async {
-    final res = await HttpServices().postWIthTokenAndBody(
-        '/api/action-of-application-user',
-        {'app_user_id': applicantId.toString(), 'type': type.toString()});
-    if (res["status"] == 200) {
-      showSuccessToast(res["data"]["original"]["message"]);
-      navigateWithoutRoute(context, const DashBoardMain());
-      navigateWithRoute(context, const ApplicantsView());
-    } else {
-      showToast("Something went wrong");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Application User List',
-            style: TextStyle(color: Colors.white)),
+        title:
+            const Text('All Companies', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
@@ -180,45 +223,37 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                           onChanged: (val) {
                             // if (val == "") {
                             //   setState(() {
-                            //     searchApplicants = [];
+                            //     searchCompanies = [];
                             //   });
                             // }
                           },
                         ),
                         const SizedBox(height: 20),
-                        searchApplicants.isNotEmpty
+                        searchCompanies.isNotEmpty
                             ? Expanded(
                                 child: ListView.builder(
-                                  itemCount: searchApplicants.length,
+                                  itemCount: searchCompanies.length,
                                   itemBuilder: (context, index) {
                                     return CardContainer(
                                       height: 260,
                                       datas: {
                                         'S. No': index + 1,
-                                        'Name': searchApplicants[index]
-                                                ["user_name"] ??
-                                            "",
-                                        'Email': searchApplicants[index]
-                                                ["email"] ??
-                                            "",
-                                        'Phone': searchApplicants[index]
-                                                ["contact_number"] ??
-                                            ""
+                                        'Name':
+                                            searchCompanies[index]["name"] ?? ""
                                       },
                                       isBottomButton: true,
                                       bottomClickData: {
-                                        "onEditClick": () {},
-                                        "onDeleteClick": () {
-                                          deleteApplicant(
-                                              searchApplicants[index]["id"],
-                                              index);
-                                        }
-                                      }, context: context,
+                                        "onLeftLabel": "Edit",
+                                        "onRightLabel": "Delete",
+                                        "onLeftClick": () {},
+                                        "onRightClick": () {}
+                                      },
+                                      context: context,
                                     );
                                   },
                                 ),
                               )
-                            : searchApplicants.isEmpty &&
+                            : searchCompanies.isEmpty &&
                                     _searchController.text.isNotEmpty &&
                                     !_show
                                 ? const Expanded(
@@ -229,57 +264,65 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                                           style: TextStyle(fontSize: 20),
                                         )),
                                   )
-                                : applicants.isEmpty
+                                : companies.isEmpty
                                     ? const Expanded(
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              "No Applicants Found",
+                                              "No companies Found",
                                               style: TextStyle(fontSize: 20),
                                             )),
                                       )
                                     : Expanded(
                                         child: ListView.builder(
-                                          itemCount: applicants.length,
+                                          itemCount: companies.length,
                                           itemBuilder: (context, index) {
                                             return CardContainer(
                                               height: 260,
                                               datas: {
                                                 'S. No': index + 1,
-                                                'Name': applicants[index]
-                                                        ["user_name"] ??
-                                                    "",
-                                                'Email': applicants[index]
-                                                        ["email"] ??
-                                                    "",
-                                                'Phone': applicants[index]
-                                                        ["contact_number"] ??
+                                                'Name': companies[index]
+                                                        ["name"] ??
                                                     ""
                                               },
                                               isBottomButton: true,
                                               bottomClickData: {
-                                                "onLeftLabel": applicants[index]
-                                                            ["user_block"] ==
-                                                        0
-                                                    ? "Block"
-                                                    : "UnBlock",
+                                                "onLeftLabel": "Edit",
                                                 "onRightLabel": "Delete",
                                                 "onLeftClick": () {
-                                                  updateApplicant(
-                                                      applicants[index]["id"],
-                                                      applicants[index][
-                                                                  "user_block"] ==
-                                                              1
-                                                          ? "0"
-                                                          : "1",
+                                                  setState(() {
+                                                    companyName =
+                                                        companies[index]
+                                                                ["name"] ??
+                                                            "";
+                                                  });
+                                                  showTextFieldAlert(
+                                                      "Update Company",
+                                                      "Enter COmpany Name",
+                                                      companyName,
+                                                      (val) {
+                                                        companyName = val;
+                                                      },
+                                                      () {
+                                                        editCompany(
+                                                            companies[index]
+                                                                ["id"],
+                                                            context);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      "Update",
+                                                      () {
+                                                        Navigator.pop(context);
+                                                      },
                                                       context);
                                                 },
                                                 "onRightClick": () {
-                                                  deleteApplicant(
-                                                      applicants[index]["id"],
+                                                  deleteCompany(
+                                                      companies[index]["id"],
                                                       index);
                                                 }
-                                              }, context: context,
+                                              },
+                                              context: context,
                                             );
                                           },
                                         ),
@@ -291,6 +334,31 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                   ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showTextFieldAlert(
+              "Add Company",
+              "Enter Company Name",
+              companyName,
+              (val) {
+                companyName = val;
+              },
+              () {
+                addCompany(context);
+                Navigator.pop(context);
+              },
+              "Add",
+              () {
+                Navigator.pop(context);
+              },
+              context);
+        },
+        backgroundColor: ColorTheme.primaryColor,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

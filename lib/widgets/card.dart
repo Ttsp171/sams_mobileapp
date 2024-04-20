@@ -151,6 +151,7 @@ Widget workOrderCard({
 class CardContainer extends StatefulWidget {
   final Map datas;
   final double height;
+  final BuildContext context;
   final bool isBottomButton;
   final Map bottomClickData;
   const CardContainer(
@@ -158,7 +159,7 @@ class CardContainer extends StatefulWidget {
       required this.datas,
       required this.isBottomButton,
       required this.height,
-      required this.bottomClickData});
+      required this.bottomClickData, required this.context});
 
   @override
   State<CardContainer> createState() => _CardContainerState();

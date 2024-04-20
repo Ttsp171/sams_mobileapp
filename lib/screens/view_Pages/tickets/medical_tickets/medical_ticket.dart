@@ -251,7 +251,7 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
                                               searchMedicalTickets[index]["id"],
                                               index);
                                         }
-                                      },
+                                      }, context: context,
                                     );
                                   },
                                 ),
@@ -330,7 +330,7 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
                                                           ["id"],
                                                       index);
                                                 }
-                                              },
+                                              }, context: context,
                                             );
                                           },
                                         ),

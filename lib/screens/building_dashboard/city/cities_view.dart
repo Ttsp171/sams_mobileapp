@@ -1,50 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/utils/colors.dart';
-import 'package:sams/widgets/card.dart';
+import 'package:sams/widgets/alert_dailog.dart';
 
-import '../../../../services/api.dart';
-import '../../../../widgets/shimmer.dart';
-import '../../../../widgets/textfield.dart';
-import '../../../../widgets/toast.dart';
-import '../../../dashboard/dashboard_page.dart';
+import '../../../services/api.dart';
+import '../../../utils/colors.dart';
+import '../../../widgets/card.dart';
+import '../../../widgets/shimmer.dart';
+import '../../../widgets/textfield.dart';
+import '../../../widgets/toast.dart';
 
-class ApplicantsView extends StatefulWidget {
-  const ApplicantsView({super.key});
+class CitiesDetail extends StatefulWidget {
+  const CitiesDetail({super.key});
 
   @override
-  State<ApplicantsView> createState() => _ApplicantsViewState();
+  State<CitiesDetail> createState() => _CitiesDetailState();
 }
 
-class _ApplicantsViewState extends State<ApplicantsView> {
-  List applicants = [], searchApplicants = [];
+class _CitiesDetailState extends State<CitiesDetail> {
+  List cities = [], searchCities = [];
   int currentPage = 1;
+  String cityName = "";
   bool isLoading = false, isFirstTime = true, _show = true, isNextPage = false;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getApplicants();
+    getCities();
   }
 
-  getApplicants() async {
+  getCities() async {
     if (isLoading) return;
     setState(() {
       isLoading = true;
     });
-    final res = await HttpServices().getWithToken(
-        '/api/application-user-list?page=$currentPage&per_page=10', context);
+    final res = await HttpServices()
+        .postWIthTokenAndBody('/api/building-city', {'type': '1'});
     if (res["status"] == 200) {
       setState(() {
-        applicants.addAll(res["data"]["original"]["data"]["data"]);
+        cities.addAll(res["data"]["data"]);
         currentPage++;
         isLoading = false;
         _show = false;
         isFirstTime = false;
-        isNextPage = res["data"]["original"]["data"]["next_page_url"] == null
-            ? false
-            : true;
       });
     } else {
       setState(() {
@@ -55,17 +52,95 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     }
   }
 
+  deleteCity(cityId, index) async {
+    setState(() {
+      _show = true;
+    });
+    final res = await HttpServices().postWIthTokenAndBody(
+        '/api/building-city', {'type': '5', 'city_id': cityId.toString()});
+    print(res);
+    if (res["status"] == 200) {
+      setState(() {
+        cities.removeAt(index);
+        _show = false;
+      });
+      showSuccessToast(res["data"]["message"]);
+    } else {
+      setState(() {
+        _show = false;
+      });
+      showToast("Something went Wrong");
+    }
+  }
+
+  addCity(context) async {
+    if (cityName == "") {
+      showSuccessToast("Please Enter City Name");
+    } else {
+      setState(() {
+        _show = true;
+      });
+      final res = await HttpServices().postWIthTokenAndBody(
+          '/api/building-city',
+          {'type': '2', 'city_name': cityName.toString()});
+      if (res["status"] == 200) {
+        setState(() {
+          cities = [];
+          searchCities = [];
+          cityName = "";
+        });
+        getCities();
+        showSuccessToast(res["data"]["message"]);
+      } else {
+        setState(() {
+          _show = false;
+        });
+        showToast("Something went Wrong");
+      }
+    }
+  }
+
+  editCity(cityId, context) async {
+    if (cityName == "") {
+      showSuccessToast("Please Enter City Name");
+    } else {
+      setState(() {
+        _show = true;
+      });
+      final res = await HttpServices().postWIthTokenAndBody(
+          '/api/building-city', {
+        'type': '4',
+        'city_name': cityName.toString(),
+        'city_id': cityId.toString()
+      });
+      if (res["status"] == 200) {
+        setState(() {
+          cities = [];
+          searchCities = [];
+          cityName = "";
+        });
+        getCities();
+        showSuccessToast(res["data"]["message"]);
+      } else {
+        setState(() {
+          _show = false;
+        });
+        showToast("Something went Wrong");
+      }
+    }
+  }
+
   searchVacantProperty(keyword) async {
     // setState(() {
-    //   searchApplicants = [];
+    //   searchCities = [];
     // });
-    // for (var i in applicants) {
+    // for (var i in cities) {
     //   i.forEach((key, value) {
     //     if (value==keyword) {
     //       setState(() {
     //         _show = false;
     //       });
-    //       searchApplicants.addAll(i);
+    //       searchCities.addAll(i);
     //     } else {
     //       setState(() {
     //         _show = false;
@@ -84,7 +159,7 @@ class _ApplicantsViewState extends State<ApplicantsView> {
   //   if (res["data"]["data"]["data"].isEmpty) {
   //   } else {
   //     setState(() {
-  //       searchApplicants.addAll(res["data"]["data"]["data"]);
+  //       searchCities.addAll(res["data"]["data"]["data"]);
   //     });
   //   }
   // } else {
@@ -98,49 +173,17 @@ class _ApplicantsViewState extends State<ApplicantsView> {
     if (notification is ScrollEndNotification &&
         notification.metrics.pixels >= notification.metrics.maxScrollExtent &&
         isNextPage) {
-      getApplicants();
+      // getcities();
       return true;
     }
     return false;
-  }
-
-  deleteApplicant(applicantId, index) async {
-    setState(() {
-      _show = true;
-    });
-    final res = await HttpServices().postWIthTokenAndBody(
-        '/api/action-of-application-user',
-        {'app_user_id': applicantId.toString(), 'type': '3'});
-    if (res["status"] == 200) {
-      setState(() {
-        applicants.removeAt(index);
-        _show = false;
-      });
-      showSuccessToast(res["data"]["original"]["message"]);
-    } else {
-      showToast("Something went wrong");
-    }
-  }
-
-  updateApplicant(applicantId, type, context) async {
-    final res = await HttpServices().postWIthTokenAndBody(
-        '/api/action-of-application-user',
-        {'app_user_id': applicantId.toString(), 'type': type.toString()});
-    if (res["status"] == 200) {
-      showSuccessToast(res["data"]["original"]["message"]);
-      navigateWithoutRoute(context, const DashBoardMain());
-      navigateWithRoute(context, const ApplicantsView());
-    } else {
-      showToast("Something went wrong");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Application User List',
-            style: TextStyle(color: Colors.white)),
+        title: const Text('All Cities', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
@@ -180,45 +223,37 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                           onChanged: (val) {
                             // if (val == "") {
                             //   setState(() {
-                            //     searchApplicants = [];
+                            //     searchCities = [];
                             //   });
                             // }
                           },
                         ),
                         const SizedBox(height: 20),
-                        searchApplicants.isNotEmpty
+                        searchCities.isNotEmpty
                             ? Expanded(
                                 child: ListView.builder(
-                                  itemCount: searchApplicants.length,
+                                  itemCount: searchCities.length,
                                   itemBuilder: (context, index) {
                                     return CardContainer(
                                       height: 260,
                                       datas: {
                                         'S. No': index + 1,
-                                        'Name': searchApplicants[index]
-                                                ["user_name"] ??
-                                            "",
-                                        'Email': searchApplicants[index]
-                                                ["email"] ??
-                                            "",
-                                        'Phone': searchApplicants[index]
-                                                ["contact_number"] ??
-                                            ""
+                                        'Name':
+                                            searchCities[index]["name"] ?? ""
                                       },
                                       isBottomButton: true,
                                       bottomClickData: {
-                                        "onEditClick": () {},
-                                        "onDeleteClick": () {
-                                          deleteApplicant(
-                                              searchApplicants[index]["id"],
-                                              index);
-                                        }
-                                      }, context: context,
+                                        "onLeftLabel": "Edit",
+                                        "onRightLabel": "Delete",
+                                        "onLeftClick": () {},
+                                        "onRightClick": () {}
+                                      },
+                                      context: context,
                                     );
                                   },
                                 ),
                               )
-                            : searchApplicants.isEmpty &&
+                            : searchCities.isEmpty &&
                                     _searchController.text.isNotEmpty &&
                                     !_show
                                 ? const Expanded(
@@ -229,57 +264,62 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                                           style: TextStyle(fontSize: 20),
                                         )),
                                   )
-                                : applicants.isEmpty
+                                : cities.isEmpty
                                     ? const Expanded(
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              "No Applicants Found",
+                                              "No Cities Found",
                                               style: TextStyle(fontSize: 20),
                                             )),
                                       )
                                     : Expanded(
                                         child: ListView.builder(
-                                          itemCount: applicants.length,
+                                          itemCount: cities.length,
                                           itemBuilder: (context, index) {
                                             return CardContainer(
                                               height: 260,
                                               datas: {
                                                 'S. No': index + 1,
-                                                'Name': applicants[index]
-                                                        ["user_name"] ??
-                                                    "",
-                                                'Email': applicants[index]
-                                                        ["email"] ??
-                                                    "",
-                                                'Phone': applicants[index]
-                                                        ["contact_number"] ??
-                                                    ""
+                                                'Name':
+                                                    cities[index]["name"] ?? ""
                                               },
                                               isBottomButton: true,
                                               bottomClickData: {
-                                                "onLeftLabel": applicants[index]
-                                                            ["user_block"] ==
-                                                        0
-                                                    ? "Block"
-                                                    : "UnBlock",
+                                                "onLeftLabel": "Edit",
                                                 "onRightLabel": "Delete",
                                                 "onLeftClick": () {
-                                                  updateApplicant(
-                                                      applicants[index]["id"],
-                                                      applicants[index][
-                                                                  "user_block"] ==
-                                                              1
-                                                          ? "0"
-                                                          : "1",
+                                                  setState(() {
+                                                    cityName = cities[index]
+                                                            ["name"] ??
+                                                        "";
+                                                  });
+                                                  showTextFieldAlert(
+                                                      "Update City",
+                                                      "Enter City Name",
+                                                      cityName,
+                                                      (val) {
+                                                        cityName = val;
+                                                      },
+                                                      () {
+                                                        editCity(
+                                                            cities[index]["id"],
+                                                            context);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      "Update",
+                                                      () {
+                                                        Navigator.pop(context);
+                                                      },
                                                       context);
                                                 },
                                                 "onRightClick": () {
-                                                  deleteApplicant(
-                                                      applicants[index]["id"],
+                                                  deleteCity(
+                                                      cities[index]["id"],
                                                       index);
                                                 }
-                                              }, context: context,
+                                              },
+                                              context: context,
                                             );
                                           },
                                         ),
@@ -291,6 +331,31 @@ class _ApplicantsViewState extends State<ApplicantsView> {
                   ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showTextFieldAlert(
+              "Add City",
+              "Enter City Name",
+              cityName,
+              (val) {
+                cityName = val;
+              },
+              () {
+                addCity(context);
+                Navigator.pop(context);
+              },
+              "Add",
+              () {
+                Navigator.pop(context);
+              },
+              context);
+        },
+        backgroundColor: ColorTheme.primaryColor,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

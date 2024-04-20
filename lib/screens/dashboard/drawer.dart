@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
+import 'package:sams/screens/building_dashboard/city/cities_view.dart';
+import 'package:sams/screens/building_dashboard/company/companies_view.dart';
 import 'package:sams/screens/view_Pages/tickets/application_users/applicants.dart';
 import 'package:sams/screens/view_Pages/tickets/fm_tickets/fmticket_view.dart';
 
+import '../building_dashboard/projects/projects_view.dart';
 import '../view_Pages/tickets/medical_tickets/medical_ticket.dart';
 
 class EndDrawerCustom extends StatefulWidget {
@@ -42,7 +45,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "City",
             "icon": Icons.location_city,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const CitiesDetail());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
@@ -56,14 +61,18 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Company",
             "icon": Icons.compare_sharp,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const CompaniesDetail());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
           {
             "itemName": "Projects",
             "icon": Icons.personal_injury,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const ProjectsDetail());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
