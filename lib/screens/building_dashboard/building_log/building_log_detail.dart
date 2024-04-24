@@ -1,61 +1,54 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sams/controllers/datetime_controller.dart';
-import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/utils/colors.dart';
-import 'package:sams/widgets/card.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:sams/config/env.dart';
 
-import '../../../../services/api.dart';
-import '../../../../widgets/shimmer.dart';
-import '../../../../widgets/textfield.dart';
-import '../../../../widgets/toast.dart';
-import '../add_tickets.dart';
+import '../../../controllers/datetime_controller.dart';
+import '../../../services/api.dart';
+import '../../../utils/colors.dart';
+import '../../../widgets/card.dart';
+import '../../../widgets/shimmer.dart';
+import '../../../widgets/textfield.dart';
+import '../../../widgets/toast.dart';
 
-class MedicalTicketView extends StatefulWidget {
-  const MedicalTicketView({super.key});
+class BuildingLogDetails extends StatefulWidget {
+  const BuildingLogDetails({super.key});
 
   @override
-  State<MedicalTicketView> createState() => _MedicalTicketViewState();
+  State<BuildingLogDetails> createState() => _BuildingLogDetailsState();
 }
 
-class _MedicalTicketViewState extends State<MedicalTicketView> {
-  List medicalTickets = [], searchMedicalTickets = [];
-  int currentPage = 1;
-  bool downloading = false;
-  String downloadMessage = '';
-  bool isLoading = false,
+class _BuildingLogDetailsState extends State<BuildingLogDetails> {
+  List buildingLogs = [], searchBuildingLogs = [];
+  bool showSave = true,
+      downloading = false,
+      isLoading = false,
       isFirstTime = true,
-      _show = true,
-      showSave = true,
-      isNextPage = false;
+      _show = true;
+  String downloadMessage = '';
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getmedicalTicketsData();
+    getBuildingLog();
   }
 
-  getmedicalTicketsData() async {
+  getBuildingLog() async {
     if (isLoading) return;
     setState(() {
       isLoading = true;
     });
-    final res = await HttpServices().getWithToken(
-        '/api/get-tickets?type=2&per_page=10&page=$currentPage', context);
+    final res =
+        await HttpServices().getWithToken('/api/get-buildinglog-list', context);
     if (res["status"] == 200) {
       setState(() {
-        medicalTickets.addAll(res["data"]["original"]["data"]["data"]);
-        currentPage++;
+        buildingLogs.addAll(res["data"]["data"]);
         isLoading = false;
         _show = false;
         isFirstTime = false;
-        isNextPage = res["data"]["original"]["data"]["next_page_url"] == null
-            ? false
-            : true;
       });
     } else {
       setState(() {
@@ -66,78 +59,12 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
     }
   }
 
-  searchVacantProperty(keyword) async {
-    // setState(() {
-    //   searchMedicalTickets = [];
-    // });
-    // for (var i in medicalTickets) {
-    //   i.forEach((key, value) {
-    //     if (value==keyword) {
-    //       setState(() {
-    //         _show = false;
-    //       });
-    //       searchMedicalTickets.addAll(i);
-    //     } else {
-    //       setState(() {
-    //         _show = false;
-    //       });
-    //       showToast("No Search Results Found");
-    //     }
-    //   });
-  }
-  // final res = await HttpServices().post(
-  //     '/api/v1/leasingtenants-ms/leases/vacant-properties?keyword=$keyword&page=1&size=50',
-  //     context);
-  // if (res["status"] == 200) {
-  //   setState(() {
-  //     _show = false;
-  //   });
-  //   if (res["data"]["data"]["data"].isEmpty) {
-  //   } else {
-  //     setState(() {
-  //       searchMedicalTickets.addAll(res["data"]["data"]["data"]);
-  //     });
-  //   }
-  // } else {
-  //   setState(() {
-  //     _show = false;
-  //   });
-  //   showToast(res["data"]["message"]);
-  // }
-
-  bool _onScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollEndNotification &&
-        notification.metrics.pixels >= notification.metrics.maxScrollExtent &&
-        isNextPage) {
-      getmedicalTicketsData();
-      return true;
-    }
-    return false;
-  }
-
-  deleteTicket(ticketId, index) async {
-    setState(() {
-      _show = true;
-    });
-    final res = await HttpServices().postWIthTokenAndBody(
-        '/api/delete-ticket', {'ticket_id': ticketId.toString()});
-    if (res["status"] == 200) {
-      setState(() {
-        medicalTickets.removeAt(index);
-        _show = false;
-      });
-      showSuccessToast(res["data"]["message"]);
-    } else {
-      showToast("Something went wrong");
-    }
-  }
-
   getCSVDownloadLink() async {
     setState(() {
       showSave = false;
     });
     final res =
-        await HttpServices().getWithToken('/api/tickets-export', context);
+        await HttpServices().getWithToken('/api/export-building-log', context);
     if (res["status"] == 200) {
       downloadFile(res["data"]["data"]["export_url"],
           "${res["data"]["data"]["file_name"]}${DateTime.now().toString()}.xlsx");
@@ -173,13 +100,20 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
     showSuccessToast('Downloaded $filename');
   }
 
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollEndNotification &&
+        notification.metrics.pixels >= notification.metrics.maxScrollExtent) {
+      // getBuildingLogs();
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // double w = MediaQuery.of(context).size.width;
-    // double h = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Medical Ticketing Dashboard',
+        title: const Text('Building Log Dashboard',
             style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -203,7 +137,7 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
                   color: Colors.black,
                   weight: BorderSide.strokeAlignOutside,
                 )),
-          )
+          ),
         ],
         backgroundColor: ColorTheme.primaryColor,
       ),
@@ -237,73 +171,67 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
                           onChanged: (val) {
                             // if (val == "") {
                             //   setState(() {
-                            //     searchMedicalTickets = [];
+                            //     searchBuildingLogs = [];
                             //   });
                             // }
                           },
                         ),
                         const SizedBox(height: 20),
-                        searchMedicalTickets.isNotEmpty
+                        searchBuildingLogs.isNotEmpty
                             ? Expanded(
                                 child: ListView.builder(
-                                  itemCount: searchMedicalTickets.length,
+                                  itemCount: searchBuildingLogs.length,
                                   itemBuilder: (context, index) {
                                     return CardContainer(
                                       height: 260,
                                       datas: {
-                                        'S. No': searchMedicalTickets[index]
+                                        'S. No': searchBuildingLogs[index]
                                                 ["propertyOwnerId"] ??
                                             "",
-                                        'Name': searchMedicalTickets[index]
+                                        'Name': searchBuildingLogs[index]
                                                 ["propertyName"] ??
                                             "",
                                         'Created Date':
-                                            searchMedicalTickets[index]
+                                            searchBuildingLogs[index]
                                                     ["buildingName"] ??
                                                 "",
                                         'Building Number':
-                                            searchMedicalTickets[index]
+                                            searchBuildingLogs[index]
                                                     ["unitName"] ??
                                                 "",
-                                        'Room Number':
-                                            searchMedicalTickets[index]
-                                                    ["address"] ??
-                                                "",
-                                        'Subject': searchMedicalTickets[index]
+                                        'Room Number': searchBuildingLogs[index]
+                                                ["address"] ??
+                                            "",
+                                        'Subject': searchBuildingLogs[index]
                                                 ["type"] ??
                                             "",
-                                        'Message': searchMedicalTickets[index]
+                                        'Message': searchBuildingLogs[index]
                                                 ["availableDate"] ??
                                             "",
-                                        'Status': searchMedicalTickets[index]
+                                        'Status': searchBuildingLogs[index]
                                                 ["address"] ??
                                             "",
                                         'Completed Date':
-                                            searchMedicalTickets[index]
+                                            searchBuildingLogs[index]
                                                     ["address"] ??
                                                 "",
-                                        'Attachment':
-                                            searchMedicalTickets[index]
-                                                    ["address"] ??
-                                                "",
+                                        'Attachment': searchBuildingLogs[index]
+                                                ["address"] ??
+                                            "",
                                       },
                                       isBottomButton: true,
                                       bottomClickData: {
                                         "onLeftLabel": "Edit",
                                         "onRightLabel": "Delete",
                                         "onLeftClick": () {},
-                                        "onRightClick": () {
-                                          deleteTicket(
-                                              searchMedicalTickets[index]["id"],
-                                              index);
-                                        }
+                                        "onRightClick": () {}
                                       },
                                       context: context,
                                     );
                                   },
                                 ),
                               )
-                            : searchMedicalTickets.isEmpty &&
+                            : searchBuildingLogs.isEmpty &&
                                     _searchController.text.isNotEmpty &&
                                     !_show
                                 ? const Expanded(
@@ -314,7 +242,7 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
                                           style: TextStyle(fontSize: 20),
                                         )),
                                   )
-                                : medicalTickets.isEmpty
+                                : buildingLogs.isEmpty
                                     ? const Expanded(
                                         child: Align(
                                             alignment: Alignment.center,
@@ -325,58 +253,74 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
                                       )
                                     : Expanded(
                                         child: ListView.builder(
-                                          itemCount: medicalTickets.length,
+                                          itemCount: buildingLogs.length,
                                           itemBuilder: (context, index) {
                                             return CardContainer(
                                               height: 260,
                                               datas: {
                                                 'S. No': index + 1,
-                                                'Name': medicalTickets[index]
-                                                        ["employee_name"] ??
-                                                    "",
-                                                'Created Date':
-                                                    formatDateToDDMMYYYYHHMMString(
-                                                        medicalTickets[index]
-                                                                ["created_at"]
-                                                            .toString()),
-                                                'Building Number':
-                                                    medicalTickets[index]
+                                                'Building Numbers':
+                                                    buildingLogs[index]
                                                             ["building_no"] ??
                                                         "",
-                                                'Room Number':
-                                                    medicalTickets[index]
-                                                            ["room_number"] ??
+                                                'Building Type':
+                                                    buildingLogs[index]
+                                                            ["building_type"] ??
                                                         "",
-                                                'Subject': medicalTickets[index]
-                                                        ["subject"] ??
+                                                'No of Rooms':
+                                                    buildingLogs[index]
+                                                            ["total_rooms"] ??
+                                                        "",
+                                                'Capacity': buildingLogs[index]
+                                                        ["total_beds_sum"] ??
                                                     "",
-                                                'Message': medicalTickets[index]
+                                                'Property': buildingLogs[index]
+                                                        ["property"] ??
+                                                    "",
+                                                'City': buildingLogs[index]
                                                         ["message"] ??
                                                     "",
-                                                'Status': medicalTickets[index]
-                                                        ["status"] ??
+                                                'PO Number': buildingLogs[index]
+                                                        ["po_no"] ??
                                                     "",
-                                                'Completed Date':
-                                                    formatDateToDDMMYYYYHHMMString(
-                                                        medicalTickets[index][
-                                                                "completed_date"]
-                                                            .toString()),
-                                                'Attachment':
-                                                    medicalTickets[index]
-                                                            ["attechment"] ??
+                                                'Attachment': buildingLogs[
+                                                                index]
+                                                            ["upload_file"] ==
+                                                        null
+                                                    ? ""
+                                                    : "${Env().baseUrl}/public/${buildingLogs[index]["upload_file"]}",
+                                                'Price': buildingLogs[index]
+                                                        ["price"] ??
+                                                    "",
+                                                'Room Prefix':
+                                                    buildingLogs[index]
+                                                            ["room_prefix"] ??
                                                         "",
+                                                'From': buildingLogs[index]
+                                                        ["from_date"] ??
+                                                    "",
+                                                'To': buildingLogs[index]
+                                                        ["to_date"] ??
+                                                    "",
+                                                'Payment Status':
+                                                    buildingLogs[index]
+                                                            ["payment_status"] ??
+                                                        "",
+                                                'Payment Type':
+                                                    buildingLogs[index]
+                                                            ["payment_type"] ??
+                                                        "",
+                                                'Installment':
+                                                    buildingLogs[index]
+                                                            ["installments_sum_amount"] ??
+                                                        ""
                                               },
                                               isBottomButton: true,
                                               bottomClickData: {
                                                 "onLeftLabel": "Edit",
                                                 "onRightLabel": "Delete",
                                                 "onLeftClick": () {},
-                                                "onRightClick": () {
-                                                  deleteTicket(
-                                                      medicalTickets[index]
-                                                          ["id"],
-                                                      index);
-                                                }
+                                                "onRightClick": () {}
                                               },
                                               context: context,
                                             );
@@ -392,9 +336,7 @@ class _MedicalTicketViewState extends State<MedicalTicketView> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          navigateWithRoute(context, const AddTickets());
-        },
+        onPressed: () {},
         backgroundColor: ColorTheme.primaryColor,
         child: const Icon(
           Icons.add,

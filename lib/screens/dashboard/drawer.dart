@@ -5,10 +5,13 @@ import 'package:sams/screens/building_dashboard/company/companies_view.dart';
 import 'package:sams/screens/view_Pages/tickets/application_users/applicants.dart';
 import 'package:sams/screens/view_Pages/tickets/fm_tickets/fmticket_view.dart';
 
+import '../building_dashboard/building_log/building_log_detail.dart';
 import '../building_dashboard/projects/projects_view.dart';
+import '../reports/warehouse_report.dart';
 import '../view_Pages/tickets/medical_tickets/medical_ticket.dart';
 
 class EndDrawerCustom extends StatefulWidget {
+  final Map drawerData;
   final String imageData;
   final BuildContext context;
   final String userName;
@@ -16,7 +19,8 @@ class EndDrawerCustom extends StatefulWidget {
       {super.key,
       required this.imageData,
       required this.userName,
-      required this.context});
+      required this.context,
+      required this.drawerData});
 
   @override
   State<EndDrawerCustom> createState() => _EndDrawerCustomState();
@@ -28,6 +32,7 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
   @override
   void initState() {
     super.initState();
+    print(widget.drawerData);
     drawerItems.addAll([
       {
         "itemName": "Home",
@@ -54,7 +59,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Building Log",
             "icon": Icons.build_circle,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const BuildingLogDetails());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
@@ -227,7 +234,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Warehouse Reports",
             "icon": Icons.warehouse,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const WareHouseReport());
+            },
             "isSubExpand": false,
             "expandItems": []
           },

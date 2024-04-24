@@ -334,6 +334,9 @@ class _CitiesDetailState extends State<CitiesDetail> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          setState(() {
+            cityName = "";
+          });
           showTextFieldAlert(
               "Add City",
               "Enter City Name",

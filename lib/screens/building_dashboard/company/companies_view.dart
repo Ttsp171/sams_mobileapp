@@ -337,6 +337,9 @@ class _CompaniesDetailState extends State<CompaniesDetail> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          setState(() {
+            companyName = "";
+          });
           showTextFieldAlert(
               "Add Company",
               "Enter Company Name",

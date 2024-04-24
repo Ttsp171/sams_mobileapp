@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../services/api.dart';
 import '../../../utils/colors.dart';
+import '../../../widgets/alert_dailog.dart';
 import '../../../widgets/card.dart';
 import '../../../widgets/shimmer.dart';
 import '../../../widgets/textfield.dart';
@@ -17,6 +18,7 @@ class ProjectsDetail extends StatefulWidget {
 class _ProjectsDetailState extends State<ProjectsDetail> {
   List projects = [], searchProjects = [];
   int currentPage = 1;
+  String projectName = "";
   bool isLoading = false, isFirstTime = true, _show = true, isNextPage = false;
   final TextEditingController _searchController = TextEditingController();
 
@@ -56,6 +58,7 @@ class _ProjectsDetailState extends State<ProjectsDetail> {
     });
     final res = await HttpServices().postWIthTokenAndBody(
         '/api/project', {'type': '5', 'project_id': projectId.toString()});
+    print(res);
     if (res["status"] == 200) {
       setState(() {
         projects.removeAt(index);
@@ -66,7 +69,62 @@ class _ProjectsDetailState extends State<ProjectsDetail> {
       setState(() {
         _show = false;
       });
-      showToast("Something Went Wrong");
+      showToast("Something went Wrong");
+    }
+  }
+
+  addProject(context) async {
+    if (projectName == "") {
+      showSuccessToast("Please Enter Project Name");
+    } else {
+      setState(() {
+        _show = true;
+      });
+      final res = await HttpServices().postWIthTokenAndBody('/api/project',
+          {'type': '2', 'project_name': projectName.toString()});
+      if (res["status"] == 200) {
+        setState(() {
+          projects = [];
+          searchProjects = [];
+          projectName = "";
+        });
+        getProjects();
+        showSuccessToast(res["data"]["message"]);
+      } else {
+        setState(() {
+          _show = false;
+        });
+        showToast("Something went Wrong");
+      }
+    }
+  }
+
+  editProject(projectId, context) async {
+    if (projectName == "") {
+      showSuccessToast("Please Enter Project Name");
+    } else {
+      setState(() {
+        _show = true;
+      });
+      final res = await HttpServices().postWIthTokenAndBody('/api/project', {
+        'type': '4',
+        'project_name': projectName.toString(),
+        'project_id': projectId.toString()
+      });
+      if (res["status"] == 200) {
+        setState(() {
+          projects = [];
+          searchProjects = [];
+          projectName = "";
+        });
+        getProjects();
+        showSuccessToast(res["data"]["message"]);
+      } else {
+        setState(() {
+          _show = false;
+        });
+        showToast("Something went Wrong");
+      }
     }
   }
 
@@ -188,7 +246,8 @@ class _ProjectsDetailState extends State<ProjectsDetail> {
                                         "onRightLabel": "Delete",
                                         "onLeftClick": () {},
                                         "onRightClick": () {}
-                                      }, context: context,
+                                      },
+                                      context: context,
                                     );
                                   },
                                 ),
@@ -209,7 +268,7 @@ class _ProjectsDetailState extends State<ProjectsDetail> {
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              "No projects Found",
+                                              "No Projects Found",
                                               style: TextStyle(fontSize: 20),
                                             )),
                                       )
@@ -229,13 +288,40 @@ class _ProjectsDetailState extends State<ProjectsDetail> {
                                               bottomClickData: {
                                                 "onLeftLabel": "Edit",
                                                 "onRightLabel": "Delete",
-                                                "onLeftClick": () {},
+                                                "onLeftClick": () {
+                                                  setState(() {
+                                                    projectName =
+                                                        projects[index]
+                                                                ["name"] ??
+                                                            "";
+                                                  });
+                                                  showTextFieldAlert(
+                                                      "Update Project",
+                                                      "Enter Project Name",
+                                                      projectName,
+                                                      (val) {
+                                                        projectName = val;
+                                                      },
+                                                      () {
+                                                        editProject(
+                                                            projects[index]
+                                                                ["id"],
+                                                            context);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      "Update",
+                                                      () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      context);
+                                                },
                                                 "onRightClick": () {
                                                   deleteProject(
                                                       projects[index]["id"],
                                                       index);
                                                 }
-                                              }, context: context,
+                                              },
+                                              context: context,
                                             );
                                           },
                                         ),
@@ -249,7 +335,27 @@ class _ProjectsDetailState extends State<ProjectsDetail> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          setState(() {
+            projectName = "";
+          });
+          showTextFieldAlert(
+              "Add Project",
+              "Enter Project Name",
+              projectName,
+              (val) {
+                projectName = val;
+              },
+              () {
+                addProject(context);
+                Navigator.pop(context);
+              },
+              "Add",
+              () {
+                Navigator.pop(context);
+              },
+              context);
+        },
         backgroundColor: ColorTheme.primaryColor,
         child: const Icon(
           Icons.add,

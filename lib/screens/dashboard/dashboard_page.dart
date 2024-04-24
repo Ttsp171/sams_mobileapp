@@ -24,6 +24,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
   Map userDetails = {};
   Map dashBoardData = {};
   List dashBoardMain = [];
+  Map drawerData = {"main_items": [], "sub_items": []};
 
   @override
   void initState() {
@@ -31,8 +32,31 @@ class _DashBoardMainState extends State<DashBoardMain> {
     getAllData();
   }
 
+  // getDrawerData() async {
+  //   final res = await HttpServices().getWithToken("/api/common-data", context);
+  //   if (res["status"] == 200) {
+  //     for (var main in res["data"]["data"]["permissions"]) {
+  //       main.forEach((key, value) {
+  //         setState(() {
+  //           drawerData["main_items"].add(value);
+  //         });
+  //       });
+  //     }
+  //     for (var sub in res["data"]["data"]["building_type"]) {
+  //       sub.forEach((key, value) {
+  //         setState(() {
+  //           drawerData["sub_items"].add(value);
+  //         });
+  //       });
+  //     }
+  //   } else {
+  //     showToast("Something went Wrong in status");
+  //   }
+  // }
+
   getAllData() async {
     await getUserDetails(context);
+    // await getDrawerData();
     print(dashBoardData);
     setState(() {
       dashBoardMain.addAll([
@@ -183,13 +207,17 @@ class _DashBoardMainState extends State<DashBoardMain> {
                           child: DashBoardIconCustom(
                             customWidth: 0.9,
                             customHeight: 0.2,
-                            containerColor: const Color.fromRGBO(242, 125, 90, 0.5),
+                            containerColor:
+                                const Color.fromRGBO(242, 125, 90, 0.5),
                             child: Column(
-                             crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                               dashboardHeadLabelCount("Available Buildings", dashBoardData["total_building"].toString()),
-                               dashboardHeadLabelCount("No of Rooms", dashBoardData["total_rooms"].toString()),
-                               dashboardHeadLabelCount("Total Capacity", dashBoardData["total_beds"].toString()),
+                                dashboardHeadLabelCount("Available Buildings",
+                                    dashBoardData["total_building"].toString()),
+                                dashboardHeadLabelCount("No of Rooms",
+                                    dashBoardData["total_rooms"].toString()),
+                                dashboardHeadLabelCount("Total Capacity",
+                                    dashBoardData["total_beds"].toString()),
                               ],
                             ),
                           ),
@@ -201,8 +229,8 @@ class _DashBoardMainState extends State<DashBoardMain> {
                           child1Count:
                               dashBoardData["occupaid_room"].toString(),
                           child2Count: emptyBedCount(),
-                          label1Color:  Color.fromRGBO(210, 255, 31, 1),
-                          label2Color:Color.fromRGBO(210, 255, 31, 1),
+                          label1Color: const Color.fromRGBO(210, 255, 31, 1),
+                          label2Color: const Color.fromRGBO(210, 255, 31, 1),
                         ),
                         ChildWidgetWithSub(
                           subHeading: "Empty",
@@ -210,13 +238,14 @@ class _DashBoardMainState extends State<DashBoardMain> {
                           child2Label: "Beds",
                           child1Count: dashBoardData["empty_room"].toString(),
                           child2Count: dashBoardData["empty_beds"].toString(),
-                          label1Color:const Color.fromRGBO(247, 146, 146, 1),
-                          label2Color:const Color.fromRGBO(247, 146, 146, 1),
+                          label1Color: const Color.fromRGBO(247, 146, 146, 1),
+                          label2Color: const Color.fromRGBO(247, 146, 146, 1),
                         ),
                         DashBoardIconCustom(
                           customWidth: 0.9,
                           customHeight: 0.1,
-                          containerColor:  const Color.fromRGBO(206, 188, 255, 1),
+                          containerColor:
+                              const Color.fromRGBO(206, 188, 255, 1),
                           child: Column(
                             children: [
                               const Text(
@@ -236,6 +265,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                     ),
                   ),
                   endDrawer: EndDrawerCustom(
+                    drawerData: drawerData,
                     imageData: userDetails["profile_picture"],
                     userName: userDetails["name"],
                     context: context,
@@ -264,7 +294,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                           Column(
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
@@ -335,6 +365,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                       ),
                     ),
                   )
+                 
                   //  Scaffold(
                   //     key: _scaffoldKey,
                   //     body: Column(

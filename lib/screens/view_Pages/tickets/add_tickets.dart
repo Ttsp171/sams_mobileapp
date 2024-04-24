@@ -314,16 +314,7 @@ class _AddTicketsState extends State<AddTickets> {
   }
 
   storeFMTickets(context) async {
-    // final updateRes =
-    //     await HttpServices().postWithAttachments('/api/update-user', {
-    //   'user_id': userId.toString(),
-    //   'company_id': companyId.toString(),
-    //   'contact_number': contactNo.toString()
-    // }, []);
-
-    print(
-        "  employee_name: $employeeName contact_no: $contactNo building_id: $buildingId room_id': $roomId subject': subject city_id': $cityId message': $message company_id': $companyId");
-    final res = await HttpServices().postWithAttachments(
+   final res = await HttpServices().postWithAttachments(
         '/api/add-update-tickets',
         {
           'employee_name': employeeName,
@@ -351,17 +342,6 @@ class _AddTicketsState extends State<AddTickets> {
       });
     }
   }
-
-  // getCompanyName(id) {
-  //   for (var company in companyDropDown) {
-  //     if (company["Company_ID"] == id) {
-  //       setState(() {
-  //         companyName = company["company_name"];
-  //         companyId = company["Company_ID"];
-  //       });
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
