@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DashboardWidgetContainer extends StatelessWidget {
   final String widgetName;
@@ -195,14 +196,14 @@ Widget dashboardHeadLabelCount(labelText, count) {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         child: Text(
           labelText,
           style: const TextStyle(fontFamily: "Poppin", fontSize: 22),
         ),
       ),
       Padding(
-       padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
         child: Text(
           count,
           style: const TextStyle(fontFamily: "Poppin", fontSize: 22),
@@ -210,4 +211,122 @@ Widget dashboardHeadLabelCount(labelText, count) {
       ),
     ],
   );
+}
+
+class DateTimeField extends StatefulWidget {
+  final bool isRequired;
+  final String labelText;
+  final String hintText;
+  final ValueChanged onChanged;
+  final String? errorText;
+
+  const DateTimeField({
+    super.key,
+    required this.labelText,
+    required this.hintText,
+    required this.isRequired,
+    this.errorText,
+    required this.onChanged,
+  });
+
+  @override
+  State<DateTimeField> createState() => _DateTimeFieldState();
+}
+
+class _DateTimeFieldState extends State<DateTimeField> {
+  final TextEditingController _dateController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
+        print(_dateController.text);
+        widget.onChanged(DateFormat('yyyy-MM-dd').format(_selectedDate));
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    return SizedBox(
+      width: width * 0.85,
+      height: height * 0.12,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: [
+              Text(
+                widget.labelText,
+                style: const TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.black,
+                ),
+              ),
+              if (widget.isRequired)
+                const Text(
+                  " *",
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    color: Colors.red,
+                  ),
+                ),
+              if (widget.errorText != null)
+                Text(
+                  "   ${widget.errorText}",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red.shade600,
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(
+            height: height * 0.01,
+          ),
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: TextFormField(
+              controller: _dateController,
+              decoration: InputDecoration(
+                
+               border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 16.0,
+                ),
+                hintText: widget.hintText,
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
+              ),
+              readOnly: true,
+              onTap: () => _selectDate(context),
+            ),
+          ),
+          SizedBox(
+            height: height * 0.01,
+          ),
+        ],
+      ),
+    );
+  }
 }

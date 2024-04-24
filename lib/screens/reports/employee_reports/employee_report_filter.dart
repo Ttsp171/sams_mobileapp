@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
+import 'package:sams/widgets/common_widget.dart';
 
 import '../../../services/api.dart';
 import '../../../utils/colors.dart';
@@ -178,6 +179,24 @@ class _EmployeeReportFilterState extends State<EmployeeReportFilter> {
                         govDocId = val;
                       });
                     }),
+                DateTimeField(
+                    labelText: "Start Date:",
+                    hintText: "DD/MM/YYYY",
+                    onChanged: (val) {
+                      setState(() {
+                        startDate = val.toString();
+                      });
+                    },
+                    isRequired: false),
+                DateTimeField(
+                    labelText: "End Date:",
+                    hintText: "DD/MM/YYYY",
+                    onChanged: (val) {
+                      setState(() {
+                        endDate = val.toString();
+                      });
+                    },
+                    isRequired: false),
                 CustomDropDown(
                     labelText: "Other Filters:",
                     hintText: "Other Filters",
