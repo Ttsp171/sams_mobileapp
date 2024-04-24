@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sams/services/api.dart';
+import 'package:http/http.dart' as http;
 
 import '../../utils/colors.dart';
 import '../../widgets/buttons.dart';
@@ -16,7 +20,11 @@ class WareHouseReport extends StatefulWidget {
 }
 
 class _WareHouseReportState extends State<WareHouseReport> {
-  bool showDownloadButton = false, showButton = false, showData = false;
+  bool showDownloadButton = false,
+      showButton = false,
+      showData = false,
+      showSave = true,
+      downloading = false;
   List wareHouseData = [], wareHouseDropDown = [], wareHouseDropDownValues = [];
   String? dropDownError;
   String selectedHouse = "";
@@ -40,97 +48,88 @@ class _WareHouseReportState extends State<WareHouseReport> {
     }
   }
 
-  getWareHouseReport(type, cityId) async {
+  getCSVPdfDownloadLink(type, cityId) async {
     setState(() {
-      wareHouseData.addAll([
-        {
-          "id": 22,
-          "Company_ID": 1,
-          "item_id": 7,
-          "units": "kgs",
-          "quantity": 100,
-          "awailable_qty": 60,
-          "price": 758,
-          "box_qty": null,
-          "location": "6",
-          "created_at": "2024-02-04T13:36:38.000000Z",
-          "updated_at": "2024-02-17T15:15:46.000000Z",
-          "item": {
-            "id": 7,
-            "Company_ID": 1,
-            "item_code": "003",
-            "item_description": "Blankets",
-            "status": 1,
-            "created_at": "2023-12-26T14:18:30.000000Z",
-            "updated_at": "2023-12-26T14:18:30.000000Z"
-          },
-          "city": {
-            "id": 6,
-            "Company_ID": 1,
-            "name": "surat",
-            "created_at": "2024-01-20T15:35:33.000000Z",
-            "updated_at": "2024-01-20T15:35:33.000000Z"
-          }
-        },
-        {
-          "id": 21,
-          "Company_ID": 1,
-          "item_id": 6,
-          "units": "pcs",
-          "quantity": 100,
-          "awailable_qty": 58,
-          "price": 452,
-          "box_qty": null,
-          "location": "6",
-          "created_at": "2024-02-04T13:36:20.000000Z",
-          "updated_at": "2024-02-17T15:15:41.000000Z",
-          "item": {
-            "id": 6,
-            "Company_ID": 1,
-            "item_code": "002",
-            "item_description": "Mattresses",
-            "status": 1,
-            "created_at": "2023-12-26T14:18:18.000000Z",
-            "updated_at": "2023-12-26T14:18:18.000000Z"
-          },
-          "city": {
-            "id": 6,
-            "Company_ID": 1,
-            "name": "surat",
-            "created_at": "2024-01-20T15:35:33.000000Z",
-            "updated_at": "2024-01-20T15:35:33.000000Z"
-          }
-        }
-      ]);
-      showButton = false;
-      showDownloadButton = true;
-      showData = true;
+      showSave = false;
     });
-    // validateWareHouse();
-    // if (dropDownError == null) {
-    //   final res = await HttpServices().getWithToken(
-    //       '/api/get-warehouse-reports?type=$type&warehouse_city_id=$cityId',
-    //       context);
-    //   if (res["status"] == 200) {
-    //     setState(() {
-    //       wareHouseData.addAll(res["data"]["data"]);
-    //       showButton = false;
-    //       showDownloadButton = true;
-    //     });
-    //   } else {
-    //     showToast("Error Occured");
-    //     setState(() {
-    //       showButton = false;
-    //     });
-    //   }
-    // } else {
-    //   setState(() {
-    //     showButton = false;
-    //   });
-    // }
+    final res = await HttpServices().getWithToken(
+        '/api/get-warehouse-reports?type=$type&warehouse_city_id=$cityId',
+        context);
+    if (res["status"] == 200) {
+      downloadFile(res["data"]["data"]["export_url"],
+          "${DateTime.now().toString()}${res["data"]["data"]["file_name"]}");
+    } else {
+      setState(() {
+        showSave = true;
+      });
+      showToast(res["data"]["message"]);
+    }
   }
 
-  getWareHouseList() {}
+  Future<void> downloadFile(String url, String filename) async {
+    setState(() {
+      downloading = true;
+      // downloadMessage = 'Downloading $filename...';
+    });
+    showSuccessToast('Downloading $filename');
+
+    final directory = Platform.isIOS
+        ? await getApplicationDocumentsDirectory()
+        : await getExternalStorageDirectory();
+    final filePath = '${directory!.path}/$filename';
+    final response = await http.get(Uri.parse(url));
+    final sourceFile = File(filePath);
+
+    await sourceFile.writeAsBytes(response.bodyBytes);
+
+    setState(() {
+      downloading = false;
+      showSave = true;
+      // downloadMessage = 'Downloaded $filename';
+    });
+    showSuccessToast('Downloaded $filename');
+  }
+
+  getWareHouseReport(type, cityId) async {
+    validateWareHouse();
+    if (dropDownError == null) {
+      final res = await HttpServices().getWithToken(
+          '/api/get-warehouse-reports?type=$type&warehouse_city_id=$cityId',
+          context);
+      if (res["status"] == 200) {
+        setState(() {
+          wareHouseData.addAll(res["data"]["data"]);
+          showButton = false;
+          showDownloadButton = true;
+          showData = true;
+        });
+      } else {
+        showToast("Error Occured");
+        setState(() {
+          showButton = false;
+        });
+      }
+    } else {
+      setState(() {
+        showButton = false;
+      });
+    }
+  }
+
+  getWareHouseList() async {
+    final res = await HttpServices()
+        .getWithToken('/api/warehouse-city-action?type=1', context);
+    if (res["status"] == 200) {
+      setState(() {
+        wareHouseDropDown = res["data"]["data"];
+      });
+      for (var ware in res["data"]["data"]) {
+        setState(() {
+          wareHouseDropDownValues.add(ware["name"]);
+        });
+      }
+    } else {}
+  }
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollEndNotification &&
@@ -174,79 +173,76 @@ class _WareHouseReportState extends State<WareHouseReport> {
                           hintText: "Please Select Ware House",
                           dropDownData: wareHouseDropDownValues,
                           isRequired: true,
-                          onChanged: (val) {},
+                          onChanged: (val) {
+                            var index = wareHouseDropDownValues.indexOf(val);
+                            setState(() {
+                              selectedHouse = val;
+                              selectedHouseId =
+                                  wareHouseDropDown[index]["id"].toString();
+                            });
+                          },
                           getValue: (associate) => associate),
                     ),
                     customButtonWithSize("Get Result", () {
                       setState(() {
                         showButton = true;
-                        getWareHouseReport("1", selectedHouseId);
+                        wareHouseData = [];
                       });
+                      getWareHouseReport("1", selectedHouseId);
                     }, h * 0.05, w * 0.85, Colors.white, Colors.purple,
                         showButton),
                     const SizedBox(height: 20),
                     if (showData)
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: wareHouseData.length,
-                          itemBuilder: (context, index) {
-                            return CardContainer(
-                              height: 260,
-                              datas: {
-                                'ID': index + 1,
-                                'Item Code':
-                                    wareHouseData[index]["item"]["item_code"] ?? "",
-                                'Description':
-                                    wareHouseData[index]["item"]["item_description"] ?? "",
-                                'Unit': wareHouseData[index]["units"] ?? "",
-                                'Price': wareHouseData[index]["price"] ?? "",
-                                'Quantity':
-                                    wareHouseData[index]["quantity"] ?? "",
-                                'Available Quantity':
-                                    wareHouseData[index]["awailable_qty"] ?? "",
-                              },
-                              isBottomButton: false,
-                              context: context,
-                              bottomClickData: {},
-                            );
-                          },
-                        ),
-                      ),
+                      wareHouseData.isEmpty
+                          ? const Expanded(
+                              child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "No Reports Found",
+                                    style: TextStyle(fontSize: 20),
+                                  )),
+                            )
+                          : Expanded(
+                              child: ListView.builder(
+                                itemCount: wareHouseData.length,
+                                itemBuilder: (context, index) {
+                                  return CardContainer(
+                                    height: 200,
+                                    datas: {
+                                      'ID': index + 1,
+                                      'Item Code': wareHouseData[index]["item"]
+                                              ["item_code"] ??
+                                          "",
+                                      'Description': wareHouseData[index]
+                                              ["item"]["item_description"] ??
+                                          "",
+                                      'Unit':
+                                          wareHouseData[index]["units"] ?? "",
+                                      'Price':
+                                          wareHouseData[index]["price"] ?? "",
+                                      'Quantity': wareHouseData[index]
+                                              ["quantity"] ??
+                                          "",
+                                      'Available Quantity': wareHouseData[index]
+                                              ["awailable_qty"] ??
+                                          "",
+                                    },
+                                    isBottomButton: false,
+                                    context: context,
+                                    bottomClickData: const {},
+                                  );
+                                },
+                              ),
+                            ),
+                    const SizedBox(height: 50),
                   ],
                 ),
               ),
             ),
           ],
         ),
-        // body: Center(
-        //   child: SingleChildScrollView(
-        //     child: Column(
-        //       children: [
-        //         CustomDropDown(
-        //             errorText: dropDownError,
-        //             labelText: "Ware House:",
-        //             hintText: "Please Select Ware House",
-        //             dropDownData: wareHouseDropDownValues,
-        //             isRequired: true,
-        //             onChanged: (val) {},
-        //             getValue: (associate) => associate),
-        //         customButtonWithSize("Get Result", () {
-        //           setState(() {
-        //             showButton = true;
-        //             getWareHouseReport("1", selectedHouseId);
-        //           });
-        //         }, h * 0.05, w * 0.85, Colors.white, Colors.purple, showButton),
-        //         Container(
-
-        //           width: w,
-        //           color: Colors.red,
-        //         )
-        //       ],
-        //     ),
-        //   ),
-        // ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: showDownloadButton
+        floatingActionButton: showDownloadButton && wareHouseData.isNotEmpty
             ? MediaQuery(
                 data: MediaQuery.of(context)
                     .copyWith(textScaler: const TextScaler.linear(1.0)),
@@ -269,25 +265,30 @@ class _WareHouseReportState extends State<WareHouseReport> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          getCSVPdfDownloadLink("3", selectedHouseId);
+                        },
                         child: const Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.picture_as_pdf,
-                              color: Colors.black,
+                              color: Colors.red,
                             ),
                             Text('Get PDF')
                           ],
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          getCSVPdfDownloadLink("2", selectedHouseId);
+                        },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
                               'assets/svg/excel_icon.svg',
+                              color: Colors.green,
                               height: 20,
                               width: 20,
                             ),

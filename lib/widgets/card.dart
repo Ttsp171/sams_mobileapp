@@ -159,7 +159,8 @@ class CardContainer extends StatefulWidget {
       required this.datas,
       required this.isBottomButton,
       required this.height,
-      required this.bottomClickData, required this.context});
+      required this.bottomClickData,
+      required this.context});
 
   @override
   State<CardContainer> createState() => _CardContainerState();
@@ -227,29 +228,38 @@ class _CardContainerState extends State<CardContainer> {
                             ),
                             SizedBox(
                               width: 150,
-                              child: keys[index] == "Attachment" &&
-                                      values[index] != ""
-                                  ? customFlatButtomwithSize('View', () {
-                                      navigateWithRoute(
-                                          context,
-                                          ImageViewCustom(
-                                              imageUrl: values[index]));
-                                    }, h * 0.03, w * 0.30, Colors.white,
-                                      Colors.white, Colors.blue.shade300, false)
-                                  : Text(
-                                      values[index] == "" ||
-                                              values[index] == null ||
-                                              values[index] == "null"
-                                          ? "   -"
-                                          : values[index].toString(),
-                                      style: values[index] == "" ||
-                                              values[index] == null ||
-                                              values[index] == "null"
-                                          ? const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold)
-                                          : const TextStyle(fontSize: 14),
-                                    ),
+                              child: keys[index] == "Facility"
+                                  ? IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.info_outline,color: Color.fromARGB(255, 17, 0, 255),))
+                                  : keys[index] == "Attachment" &&
+                                          values[index] != ""
+                                      ? customFlatButtomwithSize('View', () {
+                                          navigateWithRoute(
+                                              context,
+                                              ImageViewCustom(
+                                                  imageUrl: values[index]));
+                                        },
+                                          h * 0.03,
+                                          w * 0.30,
+                                          Colors.white,
+                                          Colors.white,
+                                          Colors.blue.shade300,
+                                          false)
+                                      : Text(
+                                          values[index] == "" ||
+                                                  values[index] == null ||
+                                                  values[index] == "null"
+                                              ? "   -"
+                                              : values[index].toString(),
+                                          style: values[index] == "" ||
+                                                  values[index] == null ||
+                                                  values[index] == "null"
+                                              ? const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold)
+                                              : const TextStyle(fontSize: 14),
+                                        ),
                             ),
                           ],
                         ),

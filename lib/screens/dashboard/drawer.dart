@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/screens/building_dashboard/city/cities_view.dart';
-import 'package:sams/screens/building_dashboard/company/companies_view.dart';
-import 'package:sams/screens/view_Pages/tickets/application_users/applicants.dart';
-import 'package:sams/screens/view_Pages/tickets/fm_tickets/fmticket_view.dart';
 
+import '../../controllers/navigation_controllers.dart';
 import '../building_dashboard/building_log/building_log_detail.dart';
+import '../building_dashboard/city/cities_view.dart';
+import '../building_dashboard/company/companies_view.dart';
 import '../building_dashboard/projects/projects_view.dart';
+import '../reports/employee_reports/employee_report_filter.dart';
 import '../reports/warehouse_report.dart';
+import '../view_Pages/tickets/application_users/applicants.dart';
+import '../view_Pages/tickets/fm_tickets/fmticket_view.dart';
 import '../view_Pages/tickets/medical_tickets/medical_ticket.dart';
 
 class EndDrawerCustom extends StatefulWidget {
@@ -227,7 +228,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Employee Reports",
             "icon": Icons.emoji_people_outlined,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const EmployeeReportFilter());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
