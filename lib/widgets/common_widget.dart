@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:sams/utils/colors.dart';
 
 class DashboardWidgetContainer extends StatelessWidget {
   final String widgetName;
@@ -306,8 +308,7 @@ class _DateTimeFieldState extends State<DateTimeField> {
             child: TextFormField(
               controller: _dateController,
               decoration: InputDecoration(
-                
-               border: InputBorder.none,
+                border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 16.0,
                   horizontal: 16.0,
@@ -326,6 +327,423 @@ class _DateTimeFieldState extends State<DateTimeField> {
             height: height * 0.01,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DashBoardTopContainer extends StatelessWidget {
+  final String iconUrl;
+  final String count;
+  final String labelText;
+  final Color countColor;
+  const DashBoardTopContainer(
+      {super.key,
+      required this.iconUrl,
+      required this.count,
+      required this.labelText,
+      required this.countColor});
+
+  @override
+  Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    return Container(
+      width: w * 0.44,
+      height: h * 0.16,
+      decoration: const BoxDecoration(
+        color: Color(0xffffffff),
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(w * 0.03),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SvgPicture.asset(iconUrl),
+                Text(
+                  labelText,
+                  style: TextStyle(
+                      fontFamily: "Inter",
+                      fontSize: 20,
+                      color: ColorTheme.dashboardIconColor,
+                      fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            Text(count,
+                style: TextStyle(
+                    fontFamily: "Inter",
+                    fontSize: 52,
+                    color: countColor,
+                    fontWeight: FontWeight.w600))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DashBoardTop extends StatelessWidget {
+  final String userName;
+  final String imageData;
+  const DashBoardTop(
+      {super.key, required this.userName, required this.imageData});
+
+  @override
+  Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    return Container(
+      width: w,
+      height: h * 0.15,
+      decoration: const BoxDecoration(
+        color: Color(0xffFFA500),
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
+      ),
+      child: Row(
+        children: [
+          imageData != ""
+              ? Container(
+                  margin: const EdgeInsets.only(top: 30),
+                  padding: const EdgeInsets.all(20),
+                  child: CircleAvatar(
+                      backgroundColor: const Color(0xFF005689),
+                      radius: 30,
+                      child: Image.network(imageData)),
+                )
+              : Container(
+                  margin: const EdgeInsets.only(top: 30),
+                  padding: const EdgeInsets.all(20),
+                  child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 30,
+                      child: SvgPicture.asset("assets/svg/profile_icon.svg")),
+                ),
+          Container(
+            margin: const EdgeInsets.only(top: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Hello, $userName!",
+                  style: const TextStyle(
+                      fontSize: 26,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Inter"),
+                ),
+                const Text(
+                  "Have a nice day",
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Inter"),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DashBoardMiddleSlide extends StatelessWidget {
+  final String count;
+  final Color countColor;
+  final String labelText;
+  const DashBoardMiddleSlide(
+      {super.key,
+      required this.count,
+      required this.countColor,
+      required this.labelText});
+
+  @override
+  Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    return Container(
+      width: w * 0.93,
+      height: h * 0.06,
+      decoration: const BoxDecoration(
+        color: Color(0xffFFF7EC),
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            height: h * 0.06,
+            width: w * 0.50,
+            child: Center(
+              child: Text(
+                labelText,
+                style: TextStyle(
+                    fontSize: 22,
+                    color: ColorTheme.dashboardMiddleTextColor,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Inter"),
+              ),
+            ),
+          ),
+          Container(
+            height: h * 0.06,
+            width: w * 0.42,
+            decoration: const BoxDecoration(
+              color: Color(0xffFFECCC),
+              borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(15),
+                  topRight: Radius.circular(15)),
+            ),
+            child: Center(
+              child: Text(
+                count,
+                style: TextStyle(
+                    fontSize: 42,
+                    color: countColor,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Inter"),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DashBoardCenter extends StatelessWidget {
+  final String labelText;
+  final String leftLabelText;
+  final String rightLabelText;
+  final String leftCount;
+  final String rightCount;
+  final Color countColor;
+  const DashBoardCenter(
+      {super.key,
+      required this.labelText,
+      required this.leftLabelText,
+      required this.rightLabelText,
+      required this.leftCount,
+      required this.rightCount,
+      required this.countColor});
+
+  @override
+  Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    return SizedBox(
+      width: w * 0.93,
+      height: h * 0.17,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DashBoardMini(
+            labelText: labelText,
+          ),
+          Container(
+            width: w * 0.93,
+            height: h * 0.13,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                  topRight: Radius.circular(15)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(w * 0.02),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          SvgPicture.asset("assets/svg/room_icon.svg"),
+                          Text(
+                            leftLabelText,
+                            style: TextStyle(
+                                fontFamily: "Inter",
+                                fontSize: 20,
+                                color: ColorTheme.dashboardIconColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      Text(leftCount,
+                          style: TextStyle(
+                              fontFamily: "Inter",
+                              fontSize: 42,
+                              color: countColor,
+                              fontWeight: FontWeight.w600))
+                    ],
+                  ),
+                ),
+                SizedBox(
+                    height: h * 0.11,
+                    child: const VerticalDivider(
+                      color: Color(0xffD9D9D9),
+                    )),
+                Padding(
+                  padding: EdgeInsets.all(w * 0.02),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: SvgPicture.asset("assets/svg/bed_icon.svg"),
+                          ),
+                          Text(
+                            rightLabelText,
+                            style: TextStyle(
+                                fontFamily: "Inter",
+                                fontSize: 20,
+                                color: ColorTheme.dashboardIconColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      Text(rightCount,
+                          style: TextStyle(
+                              fontFamily: "Inter",
+                              fontSize: 42,
+                              color: countColor,
+                              fontWeight: FontWeight.w600))
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DashBoardBottom extends StatelessWidget {
+  final VoidCallback onLeftClick;
+  final VoidCallback onRightClick;
+
+  const DashBoardBottom(
+      {super.key, required this.onLeftClick, required this.onRightClick});
+
+  @override
+  Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    return Container(
+      width: w,
+      height: h * 0.09,
+      decoration: const BoxDecoration(
+        color: Color(0xffFFA500),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          InkWell(
+            onTap: onLeftClick,
+            child: SizedBox(
+              width: w * 0.35,
+              height: h * 0.09,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: SvgPicture.asset(
+                      "assets/svg/profile_icon.svg",
+                      color: Colors.white,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  const Text(
+                    'Profile',
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 16, fontFamily: "Inter"),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Container(
+            height: h * 0.06,
+            width: w * 0.01,
+            color: Colors.white,
+          ),
+          InkWell(
+            onTap: onRightClick,
+            child: SizedBox(
+              width: w * 0.35,
+              height: h * 0.09,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: SvgPicture.asset(
+                      "assets/svg/menu_icon.svg",
+                      color: Colors.white,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  const Text(
+                    'Menu',
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 16, fontFamily: "Inter"),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DashBoardMini extends StatelessWidget {
+  final String labelText;
+  const DashBoardMini({super.key, required this.labelText});
+
+  @override
+  Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    return Container(
+      width: w * 0.35,
+      height: h * 0.04,
+      decoration: const BoxDecoration(
+        color: Color(0xffFFF7EC),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+      ),
+      child: Center(
+        child: Text(
+          labelText,
+          style: const TextStyle(
+              fontSize: 22,
+              color: Colors.brown,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Inter"),
+        ),
       ),
     );
   }

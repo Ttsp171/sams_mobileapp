@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ColorTheme {
+  static Color dashboardIconColor = const Color(0xffC09486);
+  static Color dashboardMiddleBottomCountColor = const Color(0xffFF6783);
+  static Color dashboardMiddleTopCountColor = const Color(0xff2F4858);
+  static Color dashboardAvailableCountColor = const Color(0xff25C196);
+  static Color dashboardNoOfCountColor = const Color(0xffFFA500);
+  static Color dashboardMiddleTextColor = const Color(0xff402E32);
+
   static Color backgroundColor = const Color(0xffFFFFFF);
   static Color textBlack = const Color(0xff434555);
   static Color textfieldBlack = const Color(0xff0A0A0A);

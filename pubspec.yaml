@@ -60,3 +60,6 @@ flutter:
     - family: Poppin
       fonts:
         - asset: assets/fonts/Poppins-Medium.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-VariableFont_slnt,wght.ttf
