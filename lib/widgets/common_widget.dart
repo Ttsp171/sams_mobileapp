@@ -380,7 +380,7 @@ class DashBoardTopContainer extends StatelessWidget {
                     fontFamily: "Inter",
                     fontSize: 52,
                     color: countColor,
-                    fontWeight: FontWeight.w600))
+                    fontWeight: FontWeight.bold))
           ],
         ),
       ),
@@ -412,10 +412,18 @@ class DashBoardTop extends StatelessWidget {
               ? Container(
                   margin: const EdgeInsets.only(top: 30),
                   padding: const EdgeInsets.all(20),
-                  child: CircleAvatar(
-                      backgroundColor: const Color(0xFF005689),
-                      radius: 30,
-                      child: Image.network(imageData)),
+                  child: Container(
+                    height: h * 0.06,
+                    width: h * 0.06,
+                    decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(99))),
+                    child: ClipOval(
+                        child: Image.network(
+                      imageData,
+                      fit: BoxFit.fill,
+                    )),
+                  ),
                 )
               : Container(
                   margin: const EdgeInsets.only(top: 30),
@@ -586,7 +594,7 @@ class DashBoardCenter extends StatelessWidget {
                               fontFamily: "Inter",
                               fontSize: 42,
                               color: countColor,
-                              fontWeight: FontWeight.w600))
+                              fontWeight: FontWeight.bold))
                     ],
                   ),
                 ),
@@ -623,7 +631,7 @@ class DashBoardCenter extends StatelessWidget {
                               fontFamily: "Inter",
                               fontSize: 42,
                               color: countColor,
-                              fontWeight: FontWeight.w600))
+                              fontWeight: FontWeight.bold))
                     ],
                   ),
                 ),

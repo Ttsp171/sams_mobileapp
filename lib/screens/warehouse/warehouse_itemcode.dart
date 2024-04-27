@@ -1,43 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:sams/widgets/alert_dailog.dart';
 
-import '../../../services/api.dart';
-import '../../../utils/colors.dart';
-import '../../../widgets/card.dart';
-import '../../../widgets/shimmer.dart';
-import '../../../widgets/textfield.dart';
-import '../../../widgets/toast.dart';
+import '../../services/api.dart';
+import '../../utils/colors.dart';
+import '../../widgets/alert_dailog.dart';
+import '../../widgets/card.dart';
+import '../../widgets/shimmer.dart';
+import '../../widgets/textfield.dart';
+import '../../widgets/toast.dart';
 
-class CitiesDetail extends StatefulWidget {
-  const CitiesDetail({super.key});
+class WareHouseItemCode extends StatefulWidget {
+  const WareHouseItemCode({super.key});
 
   @override
-  State<CitiesDetail> createState() => _CitiesDetailState();
+  State<WareHouseItemCode> createState() => _WareHouseItemCodeState();
 }
 
-class _CitiesDetailState extends State<CitiesDetail> {
-  List cities = [], searchCities = [];
+class _WareHouseItemCodeState extends State<WareHouseItemCode> {
+  List items = [], searchItems = [];
   int currentPage = 1;
-  String cityName = "";
+  String itemCode = "";
+  String itemName = "";
   bool isLoading = false, isFirstTime = true, _show = true, isNextPage = false;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getCities();
+    getItems();
   }
 
-  getCities() async {
+  getItems() async {
     if (isLoading) return;
     setState(() {
       isLoading = true;
     });
     final res = await HttpServices()
-        .postWIthTokenAndBody('/api/building-city', {'type': '1'});
+        .postWIthTokenAndBody('/api/item-code-action', {'type': '1'});
     if (res["status"] == 200) {
       setState(() {
-        cities.addAll(res["data"]["data"]);
+        items.addAll(res["data"]["data"]);
         currentPage++;
         isLoading = false;
         _show = false;
@@ -52,16 +53,16 @@ class _CitiesDetailState extends State<CitiesDetail> {
     }
   }
 
-  deleteCity(cityId, index) async {
+  deleteItem(itemId, index) async {
     setState(() {
       _show = true;
     });
     final res = await HttpServices().postWIthTokenAndBody(
-        '/api/building-city', {'type': '5', 'city_id': cityId.toString()});
+        '/api/item-code-action', {'type': '5', 'item_id': itemId.toString()});
     print(res);
     if (res["status"] == 200) {
       setState(() {
-        cities.removeAt(index);
+        items.removeAt(index);
         _show = false;
       });
       showSuccessToast(res["data"]["message"]);
@@ -73,23 +74,30 @@ class _CitiesDetailState extends State<CitiesDetail> {
     }
   }
 
-  addCity(context) async {
-    if (cityName == "") {
-      showSuccessToast("Please Enter City Name");
+  addItem(context) async {
+    if (itemCode == "") {
+      showSuccessToast("Please Enter Item Code");
+    } else if (itemName == "") {
+      showSuccessToast("Please Enter Item Name");
     } else {
       setState(() {
         _show = true;
       });
-      final res = await HttpServices().postWIthTokenAndBody(
-          '/api/building-city',
-          {'type': '2', 'city_name': cityName.toString()});
+      final res =
+          await HttpServices().postWIthTokenAndBody('/api/item-code-action', {
+        'type': '2',
+        'item_code': itemCode.toString(),
+        'item_description': itemName.toString()
+      });
       if (res["status"] == 200) {
         setState(() {
-          cities = [];
-          searchCities = [];
-          cityName = "";
+          items = [];
+          searchItems = [];
+          itemName = "";
+          itemCode = "";
         });
-        getCities();
+        Navigator.pop(context);
+        getItems();
         showSuccessToast(res["data"]["message"]);
       } else {
         setState(() {
@@ -100,26 +108,30 @@ class _CitiesDetailState extends State<CitiesDetail> {
     }
   }
 
-  editCity(cityId, context) async {
-    if (cityName == "") {
-      showSuccessToast("Please Enter City Name");
+  editItem(itemId, context) async {
+    if (itemCode == "") {
+      showSuccessToast("Please Enter Item Code");
+    } else if (itemName == "") {
+      showSuccessToast("Please Enter Item Name");
     } else {
       setState(() {
         _show = true;
       });
-      final res = await HttpServices().postWIthTokenAndBody(
-          '/api/building-city', {
+      final res =
+          await HttpServices().postWIthTokenAndBody('/api/item-code-action', {
         'type': '4',
-        'city_name': cityName.toString(),
-        'city_id': cityId.toString()
+        'item_code': itemCode.toString(),
+        'item_description': itemName.toString(),
+        'item_id': itemId.toString()
       });
       if (res["status"] == 200) {
         setState(() {
-          cities = [];
-          searchCities = [];
-          cityName = "";
+          items = [];
+          searchItems = [];
+          itemName = "";
+          itemCode = "";
         });
-        getCities();
+        getItems();
         showSuccessToast(res["data"]["message"]);
       } else {
         setState(() {
@@ -136,7 +148,7 @@ class _CitiesDetailState extends State<CitiesDetail> {
     if (notification is ScrollEndNotification &&
         notification.metrics.pixels >= notification.metrics.maxScrollExtent &&
         isNextPage) {
-      // getcities();
+      // getItems();
       return true;
     }
     return false;
@@ -146,7 +158,7 @@ class _CitiesDetailState extends State<CitiesDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Cities', style: TextStyle(color: Colors.white)),
+        title: const Text('All Items', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
@@ -186,23 +198,22 @@ class _CitiesDetailState extends State<CitiesDetail> {
                           onChanged: (val) {
                             // if (val == "") {
                             //   setState(() {
-                            //     searchCities = [];
+                            //     searchItems = [];
                             //   });
                             // }
                           },
                         ),
                         const SizedBox(height: 20),
-                        searchCities.isNotEmpty
+                        searchItems.isNotEmpty
                             ? Expanded(
                                 child: ListView.builder(
-                                  itemCount: searchCities.length,
+                                  itemCount: searchItems.length,
                                   itemBuilder: (context, index) {
                                     return CardContainer(
                                       height: 260,
                                       datas: {
                                         'S. No': index + 1,
-                                        'Name':
-                                            searchCities[index]["name"] ?? ""
+                                        'Name': searchItems[index]["name"] ?? ""
                                       },
                                       isBottomButton: true,
                                       bottomClickData: {
@@ -216,7 +227,7 @@ class _CitiesDetailState extends State<CitiesDetail> {
                                   },
                                 ),
                               )
-                            : searchCities.isEmpty &&
+                            : searchItems.isEmpty &&
                                     _searchController.text.isNotEmpty &&
                                     !_show
                                 ? const Expanded(
@@ -227,25 +238,29 @@ class _CitiesDetailState extends State<CitiesDetail> {
                                           style: TextStyle(fontSize: 20),
                                         )),
                                   )
-                                : cities.isEmpty
+                                : items.isEmpty
                                     ? const Expanded(
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              "No Cities Found",
+                                              "No items Found",
                                               style: TextStyle(fontSize: 20),
                                             )),
                                       )
                                     : Expanded(
                                         child: ListView.builder(
-                                          itemCount: cities.length,
+                                          itemCount: items.length,
                                           itemBuilder: (context, index) {
                                             return CardContainer(
                                               height: 260,
                                               datas: {
                                                 'S. No': index + 1,
-                                                'Name':
-                                                    cities[index]["name"] ?? ""
+                                                'Item Code': items[index]
+                                                        ["item_code"] ??
+                                                    "",
+                                                'Item Description': items[index]
+                                                        ["item_description"] ??
+                                                    "",
                                               },
                                               isBottomButton: true,
                                               bottomClickData: {
@@ -253,20 +268,34 @@ class _CitiesDetailState extends State<CitiesDetail> {
                                                 "onRightLabel": "Delete",
                                                 "onLeftClick": () {
                                                   setState(() {
-                                                    cityName = cities[index]
-                                                            ["name"] ??
+                                                    itemName = items[index][
+                                                            "item_description"] ??
+                                                        "";
+                                                    itemCode = items[index]
+                                                            ["item_code"] ??
                                                         "";
                                                   });
-                                                  showTextFieldAlert(
-                                                      "Update City",
-                                                      "Enter City Name",
-                                                      cityName,
+                                                  showTwoTextFieldAlert(
+                                                      "Items Update Form",
+                                                      "Item Code",
+                                                      "Please enter Item Code",
+                                                      itemCode,
                                                       (val) {
-                                                        cityName = val;
+                                                        setState(() {
+                                                          itemCode = val;
+                                                        });
+                                                      },
+                                                      "Item Description",
+                                                      "Please enter Item Description",
+                                                      itemName,
+                                                      (val) {
+                                                        setState(() {
+                                                          itemName = val;
+                                                        });
                                                       },
                                                       () {
-                                                        editCity(
-                                                            cities[index]["id"],
+                                                        editItem(
+                                                            items[index]["id"],
                                                             context);
                                                         Navigator.pop(context);
                                                       },
@@ -276,9 +305,27 @@ class _CitiesDetailState extends State<CitiesDetail> {
                                                       },
                                                       context);
                                                 },
+                                                //   showTextFieldAlert(
+                                                //       "Update City",
+                                                //       "Enter City Name",
+                                                //       itemName,
+                                                //       (val) {
+                                                //         itemName = val;
+                                                //       },
+                                                //       () {
+                                                //         editItem(
+                                                //             items[index]["id"],
+                                                //             context);
+                                                //         Navigator.pop(context);
+                                                //       },
+                                                //       "Update",
+                                                //       () {
+                                                //         Navigator.pop(context);
+                                                //       },
+                                                //       context);
+                                                // },
                                                 "onRightClick": () {
-                                                  deleteCity(
-                                                      cities[index]["id"],
+                                                  deleteItem(items[index]["id"],
                                                       index);
                                                 }
                                               },
@@ -298,18 +345,29 @@ class _CitiesDetailState extends State<CitiesDetail> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            cityName = "";
+            itemName = "";
+            itemCode = "";
           });
-          showTextFieldAlert(
-              "Add City",
-              "Enter City Name",
-              cityName,
+          showTwoTextFieldAlert(
+              "Items Entry Form",
+              "Item Code",
+              "Please enter Item Code",
+              itemCode,
               (val) {
-                cityName = val;
+                setState(() {
+                  itemCode = val;
+                });
+              },
+              "Item Description",
+              "Please enter Item Description",
+              itemName,
+              (val) {
+                setState(() {
+                  itemName = val;
+                });
               },
               () {
-                addCity(context);
-                Navigator.pop(context);
+                addItem(context);
               },
               "Add",
               () {

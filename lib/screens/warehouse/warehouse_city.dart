@@ -8,14 +8,14 @@ import '../../../widgets/shimmer.dart';
 import '../../../widgets/textfield.dart';
 import '../../../widgets/toast.dart';
 
-class CitiesDetail extends StatefulWidget {
-  const CitiesDetail({super.key});
+class WareHouseCitiesDetail extends StatefulWidget {
+  const WareHouseCitiesDetail({super.key});
 
   @override
-  State<CitiesDetail> createState() => _CitiesDetailState();
+  State<WareHouseCitiesDetail> createState() => _WareHouseCitiesDetailState();
 }
 
-class _CitiesDetailState extends State<CitiesDetail> {
+class _WareHouseCitiesDetailState extends State<WareHouseCitiesDetail> {
   List cities = [], searchCities = [];
   int currentPage = 1;
   String cityName = "";
@@ -34,7 +34,7 @@ class _CitiesDetailState extends State<CitiesDetail> {
       isLoading = true;
     });
     final res = await HttpServices()
-        .postWIthTokenAndBody('/api/building-city', {'type': '1'});
+        .postWIthTokenAndBody('/api/warehouse-city-action', {'type': '1'});
     if (res["status"] == 200) {
       setState(() {
         cities.addAll(res["data"]["data"]);
@@ -57,7 +57,7 @@ class _CitiesDetailState extends State<CitiesDetail> {
       _show = true;
     });
     final res = await HttpServices().postWIthTokenAndBody(
-        '/api/building-city', {'type': '5', 'city_id': cityId.toString()});
+        '/api/warehouse-city-action', {'type': '5', 'warehouse_city_id': cityId.toString()});
     print(res);
     if (res["status"] == 200) {
       setState(() {
@@ -75,14 +75,14 @@ class _CitiesDetailState extends State<CitiesDetail> {
 
   addCity(context) async {
     if (cityName == "") {
-      showSuccessToast("Please Enter City Name");
+      showSuccessToast("Please Enter Location Name");
     } else {
       setState(() {
         _show = true;
       });
       final res = await HttpServices().postWIthTokenAndBody(
-          '/api/building-city',
-          {'type': '2', 'city_name': cityName.toString()});
+          '/api/warehouse-city-action',
+          {'type': '2', 'warehouse_city_name': cityName.toString()});
       if (res["status"] == 200) {
         setState(() {
           cities = [];
@@ -102,16 +102,16 @@ class _CitiesDetailState extends State<CitiesDetail> {
 
   editCity(cityId, context) async {
     if (cityName == "") {
-      showSuccessToast("Please Enter City Name");
+      showSuccessToast("Please Enter Location Name");
     } else {
       setState(() {
         _show = true;
       });
       final res = await HttpServices().postWIthTokenAndBody(
-          '/api/building-city', {
+          '/api/warehouse-city-action', {
         'type': '4',
-        'city_name': cityName.toString(),
-        'city_id': cityId.toString()
+        'warehouse_city_name': cityName.toString(),
+        'warehouse_city_id': cityId.toString()
       });
       if (res["status"] == 200) {
         setState(() {
@@ -130,7 +130,7 @@ class _CitiesDetailState extends State<CitiesDetail> {
     }
   }
 
-  searchCity(keyword) async {}
+  searchVacantProperty(keyword) async {}
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollEndNotification &&
@@ -146,7 +146,8 @@ class _CitiesDetailState extends State<CitiesDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Cities', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('All WareHouse', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
@@ -258,8 +259,8 @@ class _CitiesDetailState extends State<CitiesDetail> {
                                                         "";
                                                   });
                                                   showTextFieldAlert(
-                                                      "Update City",
-                                                      "Enter City Name",
+                                                      "Update Location",
+                                                      "Enter Location Name",
                                                       cityName,
                                                       (val) {
                                                         cityName = val;
@@ -301,8 +302,8 @@ class _CitiesDetailState extends State<CitiesDetail> {
             cityName = "";
           });
           showTextFieldAlert(
-              "Add City",
-              "Enter City Name",
+              "Add Location",
+              "Please Enter Location Name",
               cityName,
               (val) {
                 cityName = val;

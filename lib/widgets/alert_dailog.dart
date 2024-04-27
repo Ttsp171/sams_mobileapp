@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sams/utils/colors.dart';
+import 'package:sams/widgets/textfield.dart';
 
 import '../screens/maintenance/force_update.dart';
 
@@ -31,8 +32,8 @@ showAlertBox(title, content, postiveButton, postiveAction, negativeButton,
   );
 }
 
-showTextFieldAlert(title, hintText,  initialValue, onChanged,
-    postiveAction,positiveButton, negativeAction, context) {
+showTextFieldAlert(title, hintText, initialValue, onChanged, postiveAction,
+    positiveButton, negativeAction, context) {
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -57,6 +58,68 @@ showTextFieldAlert(title, hintText,  initialValue, onChanged,
             onTapOutside: (event) {
               FocusScope.of(context).unfocus();
             },
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+              onPressed: negativeAction,
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.black),
+              )),
+          TextButton(
+              onPressed: postiveAction,
+              child: Text(
+                positiveButton,
+                style: TextStyle(color: ColorTheme.primaryColor),
+              )),
+        ],
+      );
+    },
+  );
+}
+
+showTwoTextFieldAlert(
+    title,
+    firstLabelText,
+    firstHintText,
+    firstInitialValue,
+    firstOnChanged,
+    secondLabelText,
+    secondHintText,
+    secondInitialValue,
+    secondOnChanged,
+    postiveAction,
+    positiveButton,
+    negativeAction,
+    context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+
+        backgroundColor: const Color.fromARGB(255, 248, 239, 224),
+        title: Text(title),
+        content: SizedBox(
+          height: 202,
+          child: Column(
+            children: [
+              CustomTextFieldWithLabel(
+                labelText: firstLabelText,
+                required: false,
+                hintText: firstHintText,
+                onChanged: firstOnChanged,
+                initialValue: firstInitialValue,
+              ),
+              CustomTextFieldWithLabel(
+                labelText: secondLabelText,
+                required: false,
+                hintText: secondHintText,
+                onChanged: secondOnChanged,
+                initialValue: secondInitialValue,
+              ),
+            ],
           ),
         ),
         actions: <Widget>[

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sams/screens/reports/building_reports/building_reports_filter.dart';
+import 'package:sams/screens/warehouse/warehouse_city.dart';
+import 'package:sams/screens/warehouse/warehouse_itemcode.dart';
 
 import '../../controllers/navigation_controllers.dart';
 import '../building_dashboard/building_log/building_log_detail.dart';
@@ -94,7 +97,7 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
         ]
       },
       {
-        "itemName": "Sample 2",
+        "itemName": "Building",
         "isExpand": true,
         "icon": Icons.home,
         "expandItems": [
@@ -206,14 +209,18 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "ITEM Code",
             "icon": Icons.inventory,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const WareHouseItemCode());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
           {
             "itemName": "Warehouse City",
             "icon": Icons.warehouse,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const WareHouseCitiesDetail());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
@@ -246,7 +253,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Building Reports",
             "icon": Icons.build_circle,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const BuildingReportFilter());
+            },
             "isSubExpand": false,
             "expandItems": []
           },

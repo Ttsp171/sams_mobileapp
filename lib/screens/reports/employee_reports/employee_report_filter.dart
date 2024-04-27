@@ -44,13 +44,52 @@ class _EmployeeReportFilterState extends State<EmployeeReportFilter> {
   @override
   void initState() {
     super.initState();
+    // getCompanyData();
+    // getProjectData();
     getCommonData();
   }
+
+  // getCompanyData() async {
+  //   final res = await HttpServices()
+  //       .postWIthTokenAndBody("/api/company", {'type': '1'});
+  //   if (res["status"] == 200) {
+  //     setState(() {
+  //       companyDropDown = res["data"]["data"];
+  //     });
+  //     for (var comp in res["data"]["data"]) {
+  //       setState(() {
+  //         companyDropDownValues.add(comp["name"]);
+  //       });
+  //     }
+  //   } else {
+  //     showToast("Something went Wrong in Company");
+  //   }
+  // }
+
+  // getProjectData() async {
+  //   final res = await HttpServices()
+  //       .postWIthTokenAndBody("/api/project", {'type': '1'});
+  //   if (res["status"] == 200) {
+  //     setState(() {
+  //       projectDropDown = res["data"]["data"];
+  //     });
+  //     for (var proj in res["data"]["data"]) {
+  //       setState(() {
+  //         projectDropDownValues.add(proj["name"]);
+  //       });
+  //     }
+  //   } else {
+  //     showToast("Something went Wrong in Project");
+  //   }
+  // }
 
   getCommonData() async {
     final res = await HttpServices().getWithToken("/api/common-data", context);
     if (res["status"] == 200) {
       setState(() {
+        employeeTypeDropDown = res["data"]["data"]["employee_type"];
+        companyDropDown = res["data"]["data"]["company"];
+        projectDropDown = res["data"]["data"]["project"];
         employeeNationalityDropDown = res["data"]["data"]["nationality"];
         employeeNationalityDropDownValues = res["data"]["data"]["nationality"];
         otherDropDown = res["data"]["data"]["other_filters"];
@@ -60,6 +99,23 @@ class _EmployeeReportFilterState extends State<EmployeeReportFilter> {
           setState(() {
             otherDropDownValues.add(value);
           });
+        });
+      }
+      for (var typeEm in res["data"]["data"]["employee_type"]) {
+        typeEm.forEach((key, value) {
+          setState(() {
+            employeeTypeDropDownValues.add(value);
+          });
+        });
+      }
+      for (var comp in res["data"]["data"]["company"]) {
+        setState(() {
+          companyDropDownValues.add(comp["name"]);
+        });
+      }
+      for (var proj in res["data"]["data"]["project"]) {
+        setState(() {
+          projectDropDownValues.add(proj["name"]);
         });
       }
     } else {
@@ -128,14 +184,24 @@ class _EmployeeReportFilterState extends State<EmployeeReportFilter> {
                     hintText: "All Companies",
                     dropDownData: companyDropDownValues,
                     isRequired: false,
-                    onChanged: (val) {},
+                    onChanged: (val) {
+                      var index = companyDropDownValues.indexOf(val);
+                      setState(() {
+                        companyName = companyDropDown[index]["id"].toString();
+                      });
+                    },
                     getValue: (associate) => associate),
                 CustomDropDown(
                     labelText: "Project:",
                     hintText: "All Projects",
                     dropDownData: projectDropDownValues,
                     isRequired: false,
-                    onChanged: (val) {},
+                    onChanged: (val) {
+                      var index = projectDropDownValues.indexOf(val);
+                      setState(() {
+                        projectName = projectDropDown[index]["id"].toString();
+                      });
+                    },
                     getValue: (associate) => associate),
                 CustomDropDown(
                     labelText: "Employee Nationality:",
@@ -151,7 +217,7 @@ class _EmployeeReportFilterState extends State<EmployeeReportFilter> {
                 CustomDropDown(
                     labelText: "Employee Type:",
                     hintText: "All Types",
-                    dropDownData: projectDropDownValues,
+                    dropDownData: employeeTypeDropDownValues,
                     isRequired: false,
                     onChanged: (val) {
                       setState(() {
