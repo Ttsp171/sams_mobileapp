@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sams/screens/reports/building_reports/building_reports_filter.dart';
+import 'package:sams/screens/warehouse/inventory.dart';
+import 'package:sams/screens/warehouse/inventory_out.dart';
+import 'package:sams/screens/warehouse/request_inventory.dart';
 import 'package:sams/screens/warehouse/warehouse_city.dart';
 import 'package:sams/screens/warehouse/warehouse_itemcode.dart';
 
@@ -8,6 +11,7 @@ import '../building_dashboard/building_log/building_log_detail.dart';
 import '../building_dashboard/city/cities_view.dart';
 import '../building_dashboard/company/companies_view.dart';
 import '../building_dashboard/projects/projects_view.dart';
+import '../building_dashboard/room_arrangements/arrangements.dart';
 import '../reports/employee_reports/employee_report_filter.dart';
 import '../reports/warehouse_report.dart';
 import '../view_Pages/tickets/application_users/applicants.dart';
@@ -90,7 +94,9 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Room Arrangement",
             "icon": Icons.room_outlined,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const Arrangements());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
@@ -188,21 +194,27 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
           {
             "itemName": "Request Inventory",
             "icon": Icons.inventory,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const RequestInventory());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
           {
             "itemName": "Inventory",
             "icon": Icons.inventory,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const Inventory());
+            },
             "isSubExpand": false,
             "expandItems": []
           },
           {
             "itemName": "Inventory Out List",
             "icon": Icons.inventory,
-            "onTap": () {},
+            "onTap": () {
+              navigateWithRoute(context, const InventoryOut());
+            },
             "isSubExpand": false,
             "expandItems": []
           },

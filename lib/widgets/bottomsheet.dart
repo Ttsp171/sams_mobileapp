@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 
 googleSignInSheet(BuildContext context, child) {
   showModalBottomSheet(
@@ -135,17 +136,42 @@ void showProfileBottomSheet(context, userName, profileImage, profileSheetData) {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                IconButton(
-                  icon: CircleAvatar(
-                      backgroundColor: const Color(0xFF005689),
-                      radius: 40,
-                      child: Image.network(profileImage)),
-                  iconSize: 80,
-                  onPressed: () {},
-                ),
+              
+                profileImage != ""
+                    ? Container(
+                        margin: const EdgeInsets.only(top: 30),
+                        padding: const EdgeInsets.all(20),
+                        child: Container(
+                          height: h * 0.1,
+                          width: h * 0.1,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(99))),
+                          child: ClipOval(
+                              child: Image.network(
+                            profileImage,
+                            fit: BoxFit.fill,
+                          )),
+                        ),
+                      )
+                    : Container(
+                        margin: const EdgeInsets.only(top: 30),
+                        padding: const EdgeInsets.all(20),
+                        child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 40,
+                            child: SvgPicture.asset(
+                                "assets/svg/profile_icon.svg")),
+                      ),
+                // IconButton(
+                //   icon: CircleAvatar(
+                //       backgroundColor: const Color(0xFF005689),
+                //       radius: 40,
+                //       child: Image.network(profileImage)),
+                //   iconSize: 80,
+                //   onPressed: () {},
+                // ),
                 const SizedBox(height: 10),
                 Text(
                   "$userName",
