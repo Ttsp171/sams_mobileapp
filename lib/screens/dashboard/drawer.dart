@@ -14,9 +14,9 @@ import '../building_dashboard/projects/projects_view.dart';
 import '../building_dashboard/room_arrangements/arrangements.dart';
 import '../reports/employee_reports/employee_report_filter.dart';
 import '../reports/warehouse_report.dart';
-import '../view_Pages/tickets/application_users/applicants.dart';
-import '../view_Pages/tickets/fm_tickets/fmticket_view.dart';
-import '../view_Pages/tickets/medical_tickets/medical_ticket.dart';
+import '../tickets/application_users/applicants.dart';
+import '../tickets/fm_tickets/fmticket_view.dart';
+import '../tickets/medical_tickets/medical_ticket.dart';
 
 class EndDrawerCustom extends StatefulWidget {
   final Map drawerData;
@@ -107,48 +107,81 @@ class _EndDrawerCustomState extends State<EndDrawerCustom> {
         "isExpand": true,
         "icon": Icons.home,
         "expandItems": [
-          {
-            "itemName": "Sub Samp1",
-            "icon": Icons.abc,
-            "isSubExpand": true,
-            "expandItems": [
-              {
-                "itemName": "sunMenu2",
-                "icon": Icons.area_chart,
-                "isExpand": false,
-                "expandItems": []
-              },
-              {
-                "itemName": "sunMenu2",
-                "icon": Icons.area_chart,
-                "isExpand": false,
-                "expandItems": []
-              },
-            ]
-          }
+          for (var build in widget.drawerData["building"])
+            {
+              ...{
+                "itemName": build["building_no"],
+                "icon": Icons.abc,
+                "isSubExpand": true,
+                "expandItems": [
+                  for (var room in build["rooms"])
+                    {
+                      ...{
+                        "itemName":
+                            "${room["room_prefix"]} (${room["total_beds_count"] - room["occupied_beds_count"]}/${room["total_beds_count"]})",
+                        "icon": Icons.area_chart,
+                        "isExpand": false,
+                        "expandItems": []
+                      }
+                    }
+                ]
+              }
+            }
         ]
       },
       {
         "itemName": "Villa",
         "isExpand": true,
-        "icon": Icons.villa,
-        "onTap": () {},
+        "icon": Icons.home,
         "expandItems": [
-          {
-            "itemName": "nsdfksdfn",
-            "icon": Icons.villa_outlined,
-            "onTap": () {},
-            "isSubExpand": false,
-            "expandItems": []
-          }
+          for (var build in widget.drawerData["villa"])
+            {
+              ...{
+                "itemName": build["building_no"],
+                "icon": Icons.abc,
+                "isSubExpand": true,
+                "expandItems": [
+                  for (var room in build["rooms"])
+                    {
+                      ...{
+                        "itemName":
+                            "${room["room_prefix"]} (${room["total_beds_count"] - room["occupied_beds_count"]}/${room["total_beds_count"]})",
+                        "icon": Icons.area_chart,
+                        "isExpand": false,
+                        "expandItems": []
+                      }
+                    }
+                ]
+              }
+            }
         ]
       },
       {
         "itemName": "Camp",
-        "isExpand": false,
-        "onTap": () {},
-        "icon": Icons.campaign,
-        "expandItems": []
+        "isExpand": true,
+        "icon": Icons.home,
+        "expandItems": [
+          for (var build in widget.drawerData["camp"])
+            {
+              ...{
+                "itemName": build["building_no"],
+                "icon": Icons.abc,
+                "isSubExpand": true,
+                "expandItems": [
+                  for (var room in build["rooms"])
+                    {
+                      ...{
+                        "itemName":
+                            "${room["room_prefix"]} (${room["total_beds_count"] - room["occupied_beds_count"]}/${room["total_beds_count"]})",
+                        "icon": Icons.area_chart,
+                        "isExpand": false,
+                        "expandItems": []
+                      }
+                    }
+                ]
+              }
+            }
+        ]
       },
       {
         "itemName": "Tickets",

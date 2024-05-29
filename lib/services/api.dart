@@ -9,7 +9,7 @@ import '../seldom_app.dart';
 import '../widgets/toast.dart';
 
 class HttpServices {
-  String baseUrl = Env().baseUrl;
+  String baseUrl = Env().baseUrlUAE;
 
   Future getWithToken(endpoint, context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -100,7 +100,13 @@ class HttpServices {
 
   Future postWithAttachments(
       endpoint, Map<String, String> body, filePaths) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
     var request = http.MultipartRequest('POST', Uri.parse('$baseUrl$endpoint'));
+    request.headers.addAll({
+      'Accept-Language': 'EN-US',
+      'Authorization': 'Bearer ${prefs.getString(prefKey.token)}'
+    });
     request.fields.addAll(body);
 
     if (filePaths.isNotEmpty) {
@@ -136,10 +142,7 @@ class HttpServices {
       var response = await request.send();
       if (response.statusCode == 200) {
         var dataNew = await response.stream.bytesToString();
-        return {
-          "status": response.statusCode,
-          "data": json.decode(dataNew)
-        };
+        return {"status": response.statusCode, "data": json.decode(dataNew)};
       } else {
         return {"status": response.statusCode, "data": response.reasonPhrase};
       }

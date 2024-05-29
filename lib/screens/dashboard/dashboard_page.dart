@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sams/controllers/navigation_controllers.dart';
 import 'package:sams/utils/colors.dart';
 import 'package:sams/widgets/common_widget.dart';
 
@@ -7,6 +8,7 @@ import '../../services/api.dart';
 import '../../widgets/alert_dailog.dart';
 import '../../widgets/bottomsheet.dart';
 import '../../widgets/toast.dart';
+import '../user_directory/user_directory.dart';
 import 'drawer.dart';
 
 class DashBoardMain extends StatefulWidget {
@@ -22,7 +24,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
   Map userDetails = {};
   Map dashBoardData = {};
   List dashBoardMain = [];
-  Map drawerData = {"main_items": [], "sub_items": []};
+  Map buildingDrawer = {};
 
   @override
   void initState() {
@@ -30,9 +32,21 @@ class _DashBoardMainState extends State<DashBoardMain> {
     getAllData();
   }
 
+  getDrawerData() async {
+    final res = await HttpServices()
+        .getWithToken('/api/sidebar-buildings-room', context);
+    if (res["status"] == 200) {
+      setState(() {
+        buildingDrawer = res["data"]["data"];
+      });
+    } else {
+      showToast("Something Wrong in Building error");
+    }
+  }
+
   getAllData() async {
     await getUserDetails(context);
-    // await getDrawerData();
+    await getDrawerData();
     print(dashBoardData);
     setState(() {
       dashBoardMain.addAll([
@@ -131,7 +145,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
             )
           : Scaffold(
               key: _scaffoldKey,
-              backgroundColor: Color.fromARGB(255, 239, 223, 195),
+              backgroundColor: const Color.fromARGB(255, 239, 223, 195),
 
               // backgroundColor: const Color.fromARGB(255, 0, 0, 0),
               // backgroundColor: Color.fromARGB(161, 230, 191, 191),
@@ -224,7 +238,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                             "icon": Icons.verified_user_outlined,
                             "title": "User Directory",
                             "onTap": () {
-                              print("object");
+                              navigateWithRoute(context, const UserDirectory());
                             }
                           },
                           {
@@ -255,7 +269,7 @@ class _DashBoardMainState extends State<DashBoardMain> {
                 ),
               ),
               endDrawer: EndDrawerCustom(
-                drawerData: drawerData,
+                drawerData: buildingDrawer,
                 imageData: userDetails["profile_picture"],
                 userName: userDetails["name"],
                 context: context,

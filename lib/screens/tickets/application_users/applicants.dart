@@ -3,11 +3,11 @@ import 'package:sams/controllers/navigation_controllers.dart';
 import 'package:sams/utils/colors.dart';
 import 'package:sams/widgets/card.dart';
 
-import '../../../../services/api.dart';
-import '../../../../widgets/shimmer.dart';
-import '../../../../widgets/textfield.dart';
-import '../../../../widgets/toast.dart';
-import '../../../dashboard/dashboard_page.dart';
+import '../../../services/api.dart';
+import '../../../widgets/shimmer.dart';
+import '../../../widgets/textfield.dart';
+import '../../../widgets/toast.dart';
+import '../../dashboard/dashboard_page.dart';
 
 class ApplicantsView extends StatefulWidget {
   const ApplicantsView({super.key});

@@ -210,12 +210,16 @@ class _WareHouseReportState extends State<WareHouseReport> {
                                     height: 200,
                                     datas: {
                                       'ID': index + 1,
-                                      'Item Code': wareHouseData[index]["item"]
-                                              ["item_code"] ??
-                                          "",
-                                      'Description': wareHouseData[index]
-                                              ["item"]["item_description"] ??
-                                          "",
+                                      'Item Code':
+                                          wareHouseData[index]["item"] == null
+                                              ? ""
+                                              : wareHouseData[index]["item"]
+                                                  ["item_code"],
+                                      'Description':
+                                          wareHouseData[index]["item"] == null
+                                              ? ""
+                                              : wareHouseData[index]["item"]
+                                                  ["item_description"],
                                       'Unit':
                                           wareHouseData[index]["units"] ?? "",
                                       'Price':

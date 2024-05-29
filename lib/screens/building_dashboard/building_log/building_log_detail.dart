@@ -59,6 +59,23 @@ class _BuildingLogDetailsState extends State<BuildingLogDetails> {
     }
   }
 
+  deleteBuildingLog(deleteId, index) async {
+    final res = await HttpServices().postWIthTokenAndBody(
+        '/api/delete-building-log', {'building_id': deleteId.toString()});
+    if (res["status"] == 200) {
+      showSuccessToast(res["data"]["message"]);
+      setState(() {
+        buildingLogs.removeAt(index);
+        _show = false;
+      });
+    } else {
+      setState(() {
+        _show = false;
+      });
+      showToast("Error Occured");
+    }
+  }
+
   getCSVDownloadLink() async {
     setState(() {
       showSave = false;
@@ -302,25 +319,32 @@ class _BuildingLogDetailsState extends State<BuildingLogDetails> {
                                                 'To': buildingLogs[index]
                                                         ["to_date"] ??
                                                     "",
-                                                'Payment Status':
-                                                    buildingLogs[index]
-                                                            ["payment_status"] ??
-                                                        "",
+                                                'Payment Status': buildingLogs[
+                                                            index]
+                                                        ["payment_status"] ??
+                                                    "",
                                                 'Payment Type':
                                                     buildingLogs[index]
                                                             ["payment_type"] ??
                                                         "",
-                                                'Installment':
-                                                    buildingLogs[index]
-                                                            ["installments_sum_amount"] ??
-                                                        ""
+                                                'Installment': buildingLogs[
+                                                            index][
+                                                        "installments_sum_amount"] ??
+                                                    ""
                                               },
                                               isBottomButton: true,
                                               bottomClickData: {
                                                 "onLeftLabel": "Edit",
                                                 "onRightLabel": "Delete",
                                                 "onLeftClick": () {},
-                                                "onRightClick": () {}
+                                                "onRightClick": () {
+                                                  setState(() {
+                                                    _show = true;
+                                                  });
+                                                  deleteBuildingLog(
+                                                      buildingLogs[index]["id"],
+                                                      index);
+                                                }
                                               },
                                               context: context,
                                             );

@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import '../../../controllers/file_pick_controllers.dart';
-import '../../../services/api.dart';
-import '../../../utils/strings.dart';
-import '../../../widgets/buttons.dart';
-import '../../../widgets/dropdown.dart';
-import '../../../widgets/file_choose.dart';
-import '../../../widgets/textfield.dart';
-import '../../../widgets/toast.dart';
+import '../../controllers/file_pick_controllers.dart';
+import '../../services/api.dart';
+import '../../utils/strings.dart';
+import '../../widgets/buttons.dart';
+import '../../widgets/dropdown.dart';
+import '../../widgets/file_choose.dart';
+import '../../widgets/textfield.dart';
+import '../../widgets/toast.dart';
 
 class AddTickets extends StatefulWidget {
   const AddTickets({super.key});

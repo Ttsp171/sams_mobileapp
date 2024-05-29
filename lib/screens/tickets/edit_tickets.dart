@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/file_pick_controllers.dart';
-import '../../../services/api.dart';
-import '../../../utils/strings.dart';
-import '../../../widgets/buttons.dart';
-import '../../../widgets/dropdown.dart';
-import '../../../widgets/file_choose.dart';
-import '../../../widgets/textfield.dart';
-import '../../../widgets/toast.dart';
+import '../../controllers/file_pick_controllers.dart';
+import '../../services/api.dart';
+import '../../utils/strings.dart';
+import '../../widgets/buttons.dart';
+import '../../widgets/dropdown.dart';
+import '../../widgets/file_choose.dart';
+import '../../widgets/textfield.dart';
+import '../../widgets/toast.dart';
 
 class EditTickets extends StatefulWidget {
   final Map ticketData;

@@ -6,13 +6,15 @@ class CustomFilePicker extends StatefulWidget {
   final String fileText;
   final bool isRequired;
   final Function onPressed;
+  final String? errorText;
   const CustomFilePicker(
       {super.key,
       required this.labelText,
       required this.uploadText,
       required this.fileText,
       required this.onPressed,
-      required this.isRequired});
+      required this.isRequired,
+      this.errorText});
 
   @override
   State<CustomFilePicker> createState() => _CustomFilePickerState();
@@ -48,6 +50,14 @@ class _CustomFilePickerState extends State<CustomFilePicker> {
                     style: TextStyle(
                       fontSize: 18.0,
                       color: Colors.red,
+                    ),
+                  ),
+                if (widget.errorText != null)
+                  Text(
+                    "   ${widget.errorText}",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red.shade600,
                     ),
                   ),
               ],

@@ -1,45 +1,54 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sams/controllers/datetime_controller.dart';
 import 'package:sams/controllers/navigation_controllers.dart';
-import 'package:sams/screens/view_Pages/tickets/edit_tickets.dart';
+import 'package:sams/utils/colors.dart';
 import 'package:sams/widgets/card.dart';
+import 'package:http/http.dart' as http;
 
-import '../../../../services/api.dart';
-import '../../../../utils/colors.dart';
-import '../../../../widgets/shimmer.dart';
-import '../../../../widgets/textfield.dart';
-import '../../../../widgets/toast.dart';
+import '../../../services/api.dart';
+import '../../../widgets/shimmer.dart';
+import '../../../widgets/textfield.dart';
+import '../../../widgets/toast.dart';
 import '../add_tickets.dart';
 
-class FMTicketView extends StatefulWidget {
-  const FMTicketView({super.key});
+class MedicalTicketView extends StatefulWidget {
+  const MedicalTicketView({super.key});
 
   @override
-  State<FMTicketView> createState() => _FMTicketViewState();
+  State<MedicalTicketView> createState() => _MedicalTicketViewState();
 }
 
-class _FMTicketViewState extends State<FMTicketView> {
-  List normalTickets = [], searchNormalTickets = [];
+class _MedicalTicketViewState extends State<MedicalTicketView> {
+  List medicalTickets = [], searchMedicalTickets = [];
   int currentPage = 1;
-  bool isLoading = false, isFirstTime = true, _show = true, isNextPage = false;
+  bool downloading = false;
+  String downloadMessage = '';
+  bool isLoading = false,
+      isFirstTime = true,
+      _show = true,
+      showSave = true,
+      isNextPage = false;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getNormalTicketsData();
+    getmedicalTicketsData();
   }
 
-  getNormalTicketsData() async {
+  getmedicalTicketsData() async {
     if (isLoading) return;
     setState(() {
       isLoading = true;
     });
     final res = await HttpServices().getWithToken(
-        '/api/get-tickets?type=1&per_page=10&page=$currentPage', context);
+        '/api/get-tickets?type=2&per_page=10&page=$currentPage', context);
     if (res["status"] == 200) {
       setState(() {
-        normalTickets.addAll(res["data"]["original"]["data"]["data"]);
+        medicalTickets.addAll(res["data"]["original"]["data"]["data"]);
         currentPage++;
         isLoading = false;
         _show = false;
@@ -59,15 +68,15 @@ class _FMTicketViewState extends State<FMTicketView> {
 
   searchVacantProperty(keyword) async {
     // setState(() {
-    //   searchNormalTickets = [];
+    //   searchMedicalTickets = [];
     // });
-    // for (var i in normalTickets) {
+    // for (var i in medicalTickets) {
     //   i.forEach((key, value) {
     //     if (value==keyword) {
     //       setState(() {
     //         _show = false;
     //       });
-    //       searchNormalTickets.addAll(i);
+    //       searchMedicalTickets.addAll(i);
     //     } else {
     //       setState(() {
     //         _show = false;
@@ -86,7 +95,7 @@ class _FMTicketViewState extends State<FMTicketView> {
   //   if (res["data"]["data"]["data"].isEmpty) {
   //   } else {
   //     setState(() {
-  //       searchNormalTickets.addAll(res["data"]["data"]["data"]);
+  //       searchMedicalTickets.addAll(res["data"]["data"]["data"]);
   //     });
   //   }
   // } else {
@@ -100,7 +109,7 @@ class _FMTicketViewState extends State<FMTicketView> {
     if (notification is ScrollEndNotification &&
         notification.metrics.pixels >= notification.metrics.maxScrollExtent &&
         isNextPage) {
-      getNormalTicketsData();
+      getmedicalTicketsData();
       return true;
     }
     return false;
@@ -114,7 +123,7 @@ class _FMTicketViewState extends State<FMTicketView> {
         '/api/delete-ticket', {'ticket_id': ticketId.toString()});
     if (res["status"] == 200) {
       setState(() {
-        normalTickets.removeAt(index);
+        medicalTickets.removeAt(index);
         _show = false;
       });
       showSuccessToast(res["data"]["message"]);
@@ -123,13 +132,54 @@ class _FMTicketViewState extends State<FMTicketView> {
     }
   }
 
+  getCSVDownloadLink() async {
+    setState(() {
+      showSave = false;
+    });
+    final res =
+        await HttpServices().getWithToken('/api/tickets-export', context);
+    if (res["status"] == 200) {
+      downloadFile(res["data"]["data"]["export_url"],
+          "${res["data"]["data"]["file_name"]}${DateTime.now().toString()}.xlsx");
+    } else {
+      setState(() {
+        showSave = true;
+      });
+      showToast(res["data"]["message"]);
+    }
+  }
+
+  Future<void> downloadFile(String url, String filename) async {
+    setState(() {
+      downloading = true;
+      // downloadMessage = 'Downloading $filename...';
+    });
+    showSuccessToast('Downloading $filename');
+
+    final directory = Platform.isIOS
+        ? await getApplicationDocumentsDirectory()
+        : await getExternalStorageDirectory();
+    final filePath = '${directory!.path}/$filename';
+    final response = await http.get(Uri.parse(url));
+    final sourceFile = File(filePath);
+
+    await sourceFile.writeAsBytes(response.bodyBytes);
+
+    setState(() {
+      downloading = false;
+      showSave = true;
+      // downloadMessage = 'Downloaded $filename';
+    });
+    showSuccessToast('Downloaded $filename');
+  }
+
   @override
   Widget build(BuildContext context) {
     // double w = MediaQuery.of(context).size.width;
     // double h = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ticketing Dashboard',
+        title: const Text('Medical Ticketing Dashboard',
             style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -142,9 +192,13 @@ class _FMTicketViewState extends State<FMTicketView> {
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.save,
+                onPressed: showSave
+                    ? () {
+                        getCSVDownloadLink();
+                      }
+                    : () {},
+                icon: Icon(
+                  showSave ? Icons.save : Icons.circle_outlined,
                   size: 40,
                   color: Colors.black,
                   weight: BorderSide.strokeAlignOutside,
@@ -183,79 +237,73 @@ class _FMTicketViewState extends State<FMTicketView> {
                           onChanged: (val) {
                             // if (val == "") {
                             //   setState(() {
-                            //     searchNormalTickets = [];
+                            //     searchMedicalTickets = [];
                             //   });
                             // }
                           },
                         ),
                         const SizedBox(height: 20),
-                        searchNormalTickets.isNotEmpty
+                        searchMedicalTickets.isNotEmpty
                             ? Expanded(
                                 child: ListView.builder(
-                                  itemCount: searchNormalTickets.length,
+                                  itemCount: searchMedicalTickets.length,
                                   itemBuilder: (context, index) {
                                     return CardContainer(
                                       height: 260,
                                       datas: {
-                                        'S. No': searchNormalTickets[index]
+                                        'S. No': searchMedicalTickets[index]
                                                 ["propertyOwnerId"] ??
                                             "",
-                                        'Name': searchNormalTickets[index]
+                                        'Name': searchMedicalTickets[index]
                                                 ["propertyName"] ??
                                             "",
                                         'Created Date':
-                                            searchNormalTickets[index]
+                                            searchMedicalTickets[index]
                                                     ["buildingName"] ??
                                                 "",
                                         'Building Number':
-                                            searchNormalTickets[index]
+                                            searchMedicalTickets[index]
                                                     ["unitName"] ??
                                                 "",
                                         'Room Number':
-                                            searchNormalTickets[index]
+                                            searchMedicalTickets[index]
                                                     ["address"] ??
                                                 "",
-                                        'Subject': searchNormalTickets[index]
+                                        'Subject': searchMedicalTickets[index]
                                                 ["type"] ??
                                             "",
-                                        'Message': searchNormalTickets[index]
+                                        'Message': searchMedicalTickets[index]
                                                 ["availableDate"] ??
                                             "",
-                                        'Status': searchNormalTickets[index]
+                                        'Status': searchMedicalTickets[index]
                                                 ["address"] ??
                                             "",
                                         'Completed Date':
-                                            searchNormalTickets[index]
+                                            searchMedicalTickets[index]
                                                     ["address"] ??
                                                 "",
-                                        'Attachment': searchNormalTickets[index]
-                                                ["address"] ??
-                                            "",
+                                        'Attachment':
+                                            searchMedicalTickets[index]
+                                                    ["address"] ??
+                                                "",
                                       },
                                       isBottomButton: true,
                                       bottomClickData: {
                                         "onLeftLabel": "Edit",
                                         "onRightLabel": "Delete",
-                                        "onLeftClick": () {
-                                          navigateWithRoute(
-                                              context,
-                                              EditTickets(
-                                                  ticketData:
-                                                      searchNormalTickets[
-                                                          index]));
-                                        },
+                                        "onLeftClick": () {},
                                         "onRightClick": () {
                                           deleteTicket(
-                                              searchNormalTickets[index]
-                                                  ["employee_name"]["id"],
+                                              searchMedicalTickets[index]["id"],
                                               index);
                                         }
-                                      }, context: context,
+                                      },
+                                      context: context,
                                     );
                                   },
                                 ),
                               )
-                            : searchNormalTickets.isEmpty &&
+                            : searchMedicalTickets.isEmpty &&
                                     _searchController.text.isNotEmpty &&
                                     !_show
                                 ? const Expanded(
@@ -266,55 +314,55 @@ class _FMTicketViewState extends State<FMTicketView> {
                                           style: TextStyle(fontSize: 20),
                                         )),
                                   )
-                                : normalTickets.isEmpty
+                                : medicalTickets.isEmpty
                                     ? const Expanded(
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              "No Tickets Found",
+                                              "No Medical Tickets Found",
                                               style: TextStyle(fontSize: 20),
                                             )),
                                       )
                                     : Expanded(
                                         child: ListView.builder(
-                                          itemCount: normalTickets.length,
+                                          itemCount: medicalTickets.length,
                                           itemBuilder: (context, index) {
                                             return CardContainer(
                                               height: 260,
                                               datas: {
                                                 'S. No': index + 1,
-                                                'Name': normalTickets[index]
+                                                'Name': medicalTickets[index]
                                                         ["employee_name"] ??
                                                     "",
                                                 'Created Date':
                                                     formatDateToDDMMYYYYHHMMString(
-                                                        normalTickets[index]
+                                                        medicalTickets[index]
                                                                 ["created_at"]
                                                             .toString()),
                                                 'Building Number':
-                                                    normalTickets[index]
+                                                    medicalTickets[index]
                                                             ["building_no"] ??
                                                         "",
                                                 'Room Number':
-                                                    normalTickets[index]
+                                                    medicalTickets[index]
                                                             ["room_number"] ??
                                                         "",
-                                                'Subject': normalTickets[index]
+                                                'Subject': medicalTickets[index]
                                                         ["subject"] ??
                                                     "",
-                                                'Message': normalTickets[index]
+                                                'Message': medicalTickets[index]
                                                         ["message"] ??
                                                     "",
-                                                'Status': normalTickets[index]
+                                                'Status': medicalTickets[index]
                                                         ["status"] ??
                                                     "",
                                                 'Completed Date':
                                                     formatDateToDDMMYYYYHHMMString(
-                                                        normalTickets[index][
+                                                        medicalTickets[index][
                                                                 "completed_date"]
                                                             .toString()),
                                                 'Attachment':
-                                                    normalTickets[index]
+                                                    medicalTickets[index]
                                                             ["attechment"] ??
                                                         "",
                                               },
@@ -322,21 +370,15 @@ class _FMTicketViewState extends State<FMTicketView> {
                                               bottomClickData: {
                                                 "onLeftLabel": "Edit",
                                                 "onRightLabel": "Delete",
-                                                "onLeftClick": () {
-                                                  navigateWithRoute(
-                                                      context,
-                                                      EditTickets(
-                                                          ticketData:
-                                                              normalTickets[
-                                                                  index]));
-                                                },
+                                                "onLeftClick": () {},
                                                 "onRightClick": () {
                                                   deleteTicket(
-                                                      normalTickets[index]
+                                                      medicalTickets[index]
                                                           ["id"],
                                                       index);
                                                 }
-                                              }, context: context,
+                                              },
+                                              context: context,
                                             );
                                           },
                                         ),
